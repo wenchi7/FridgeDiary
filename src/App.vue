@@ -1,7 +1,7 @@
 <script setup></script>
 
 <template>
-  <header>
+  <header class="font-chenyu">
     <router-view></router-view>
   </header>
 </template>

@@ -2,7 +2,11 @@
 export default {
   content: ['./index.html', './src/**/*.{js,vue,html}'],
   theme: {
-    extend: { chenyu: ['chenyuluoyan', 'sans-sorif'] },
+    extend: {
+      fontFamily: {
+        chenyu: ['ChenYuluoyan', 'sans-sorif'],
+      },
+    },
   },
   plugins: [],
 }

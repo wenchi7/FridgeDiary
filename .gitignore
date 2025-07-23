@@ -35,6 +35,7 @@ coverage
 .eslintcache
 coverage/
 .firebase/
+init.js
 .firebaserc	
 .vercel/
 .netlify/
