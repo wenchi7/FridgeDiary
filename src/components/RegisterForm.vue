@@ -79,13 +79,14 @@ const handleRegister = async () => {
       createdAt: serverTimestamp(),
     })
     alert('註冊成功！')
+    router.push('/')
   } catch (error) {
-    if (error.message === 'auth/email-already-in-use') {
+    if (error.code === 'auth/email-already-in-use') {
       alert('此電子郵件已被註冊，請嘗試其他電子郵件或登入。')
-    } else if (error.message === 'auth/weak-password') {
-      alert('密碼太弱，請設定至少六個字元。')
+    } else if (error.code === 'auth/weak-password') {
+      alert('密碼請設定至少六個字元。')
     } else {
-      alert(`註冊失敗: ${error.message}`)
+      alert('註冊失敗，請檢查是否為正確email。')
     }
   }
 }
