@@ -8,31 +8,29 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthReady = ref(false)
   const router = useRouter()
 
+  const setUser = (userData) => {
+    user.value = userData
+  }
   const initAuth = () => {
     onAuthStateChanged(auth, (firebaseUser) => {
       console.log('auth change:', firebaseUser)
       if (firebaseUser) {
-        user.value = {
+        setUser({
           id: firebaseUser.uid,
           email: firebaseUser.email,
           displayName: firebaseUser.displayName || 'user',
-        }
+        })
       } else {
-        user.value = null
+        setUser(null)
       }
       isAuthReady.value = true
     })
   }
 
-  const setUser = (userData) => {
-    user.value = userData
-    localStorage.setItem('loginUser', JSON.stringify(userData))
-  }
-
   const logOut = async () => {
     try {
       await signOut(auth)
-      localStorage.removeItem('loginUser')
+      // localStorage.removeItem('loginUser')
       user.value = null
       router.replace('/')
       console.log('登出了')
@@ -48,5 +46,5 @@ export const useAuthStore = defineStore('auth', () => {
       localStorage.removeItem('loginUser')
     }
   })
-  return { user, isAuthReady, initAuth, setUser, logOut }
+  return { user, isAuthReady, initAuth, logOut }
 })
