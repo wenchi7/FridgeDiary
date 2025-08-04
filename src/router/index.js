@@ -20,6 +20,25 @@ const router = createRouter({
       name: 'home',
       component: () => import('@/views/HomeView.vue'),
       meta: { requiresAuth: true },
+      children: [
+        {
+          path: '',
+          name: 'shoplist',
+          component: () => import('@/views/ShopListView.vue'),
+        },
+        { path: 'fridge', name: 'fridge', component: () => import('@/views/FridgePageView.vue') },
+        {
+          path: 'shortdated',
+          name: 'shortdated',
+          component: () => import('@/views/ShortDatedView.vue'),
+        },
+        { path: 'cookbook', name: 'cookbook', component: () => import('@/views/CookBook.vue') },
+        {
+          path: 'mycookbook',
+          name: 'mycookbook',
+          component: () => import('@/views/MyCookBookView.vue'),
+        },
+      ],
     },
   ],
 })
