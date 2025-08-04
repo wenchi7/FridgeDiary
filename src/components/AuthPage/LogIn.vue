@@ -23,6 +23,8 @@
 
     <div class="flex flex-col">
       <p v-if="isError" class="text-center text-red-600 text-xl mb-4">登入錯誤<br />請重新輸入！</p>
+      <p v-if="isVerified" class="text-center text-red-600 text-xl mb-4">請先驗證email信箱</p>
+
       <button
         type="submit"
         class="bg-red-900 text-white h-12 font-chenyu text-2xl tracking-widest rounded-sm cursor-pointer hover:bg-red-700"
@@ -35,18 +37,36 @@
 <script setup>
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { ref } from 'vue'
-import { auth } from '@/firebase/init'
+import { auth, db } from '@/firebase/init'
 import { useRouter } from 'vue-router'
+import { getDoc, serverTimestamp } from 'firebase/firestore'
+import { setDoc, doc } from 'firebase/firestore'
+
 const email = ref('')
 const password = ref('')
 const router = useRouter()
 const isError = ref(false)
+const isVerified = ref(false)
+
 const handleLogIn = async () => {
   try {
-    await signInWithEmailAndPassword(auth, email.value, password.value)
-
+    const userLogIn = await signInWithEmailAndPassword(auth, email.value, password.value)
+    const user = userLogIn.user
+    if (!user.emailVerified) {
+      isVerified.value = true
+      await auth.signOut()
+      return
+    }
     router.push({ name: 'home' })
-
+    const userDocRef = doc(db, 'users', user.uid)
+    const userDocSnap = await getDoc(userDocRef)
+    if (!userDocSnap.exists()) {
+      await setDoc(userDocRef, {
+        name: user.displayName,
+        email: user.email,
+        createdAt: serverTimestamp(),
+      })
+    }
     isError.value = false
     password.value = ''
   } catch (error) {

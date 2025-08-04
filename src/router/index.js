@@ -13,7 +13,7 @@ const router = createRouter({
     {
       path: '/register',
       name: 'register',
-      component: () => import('@/components/RegisterForm.vue'),
+      component: () => import('@/components/AuthPage/RegisterForm.vue'),
     },
     {
       path: '/home',

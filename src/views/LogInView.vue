@@ -20,7 +20,7 @@
 </template>
 
 <script setup>
-import LogIn from '@/components/LogIn.vue'
+import LogIn from '@/components/AuthPage/LogIn.vue'
 </script>
 <style scoped>
 .bg-svg {

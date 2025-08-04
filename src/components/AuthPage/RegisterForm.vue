@@ -41,8 +41,9 @@
             required
           />
           <button
+            :disabled="isLoading"
             type="submit"
-            class="bg-red-900 text-white h-12 font-chenyu text-3xl tracking-widest rounded-sm flex items-center justify-center cursor-pointer hover:bg-red-700"
+            class="bg-red-900 disabled:bg-gray-500 text-white h-12 font-chenyu text-3xl tracking-widest rounded-sm flex items-center justify-center cursor-pointer hover:bg-red-700"
           >
             註 冊
           </button>
@@ -52,15 +53,15 @@
   </div>
 </template>
 <script setup>
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
-import { setDoc, doc, serverTimestamp } from 'firebase/firestore'
+import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from 'firebase/auth'
 import { ref } from 'vue'
-import { auth, db } from '@/firebase/init'
+import { auth } from '@/firebase/init'
 import { useRouter } from 'vue-router'
 const userName = ref('')
 const userEmail = ref('')
 const userPassword = ref('')
 const router = useRouter()
+const isLoading = ref(false)
 const cancelRegister = () => {
   router.push('/')
 }
@@ -71,14 +72,14 @@ const handleRegister = async () => {
       userEmail.value,
       userPassword.value,
     )
+    isLoading.value = true
     const user = userCredential.user
     await updateProfile(user, { displayName: userName.value })
-    await setDoc(doc(db, 'users', user.uid), {
-      name: userName.value,
-      email: userEmail.value,
-      createdAt: serverTimestamp(),
-    })
+
+    await sendEmailVerification(user)
+    alert('驗證信已寄出！請至信箱完成驗證')
     alert('註冊成功！')
+    isLoading.value = false
     router.push('/')
   } catch (error) {
     if (error.code === 'auth/email-already-in-use') {
@@ -88,6 +89,7 @@ const handleRegister = async () => {
     } else {
       alert('註冊失敗，請檢查是否為正確email。')
     }
+    isLoading.value = false
   }
 }
 </script>
