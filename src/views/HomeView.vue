@@ -1,21 +1,20 @@
 <template>
   <main class="h-dvh w-full">
     <div class="flex flex-col h-full">
-      <div class="w-full h-1/6 bg-MyColor-purple flex flex-col">
+      <div class="relative w-full h-1/6 bg-MyColor-purple flex flex-col flex-shrink-0">
         <button
           @click="handleLogOut"
-          class="flex w-full justify-end py-4 px-8 text-pink-800 text-2xl font-semibold hover:text-red-500 cursor-pointer"
+          class="absolute right-2 w-32 py-4 px-8 text-pink-800 text-2xl font-semibold hover:text-red-500 cursor-pointer"
         >
           登出
         </button>
-        <!-- <div class="w-1/6 bg-slate-400 h-full"></div> -->
-        <nav class="w-full mt-auto z-20 md:z-0">
-          <button class="md:hidden m-4">
-            <i class="text-2xl cursor-pointer" @click="handleNavOpen">i</i>
+        <nav class="relative mt-auto z-20 sm:z-0 w-full">
+          <button class="sm:hidden m-4 absolute -top-14 left-2 z-30">
+            <i class="text-2xl cursor-pointer" @click="toggleNavOpen">☰</i>
           </button>
           <ul
-            class="flex flex-col md:flex-row justify-around px-2 text-2xl lg:text-3xl space-y-2 md:space-y-0 md:space-x-4"
-            :class="{ hidden: !isOpen, block: isOpen, 'md:flex': true }"
+            class="absolute -top-2 sm:static sm:top-auto flex flex-col shadow-md sm:flex-row justify-around px-6 text-xl md:text-2xl lg:text-3xl space-y-2 sm:space-y-0 sm:space-x-4 mx-6 sm:mx-0 bg-slate-50/60 py-4 sm:py-0 sm:bg-transparent rounded-md"
+            :class="{ hidden: !isOpen, block: isOpen, 'sm:flex': true }"
           >
             <li class="nav-btn" @click="handleCloseMenu">
               <router-link to="/home">採買日記</router-link>
@@ -47,7 +46,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { ref } from 'vue'
 
 const isOpen = ref(false)
-const handleNavOpen = () => {
+const toggleNavOpen = () => {
   isOpen.value = !isOpen.value
 }
 const authStore = useAuthStore()
@@ -63,6 +62,6 @@ const handleCloseMenu = () => {
 
 <style scoped lang="postcss">
 .nav-btn {
-  @apply py-1 px-3 bg-red-300 lg:py-2 lg:px-5 rounded-full md:rounded-b-none md:rounded-t-3xl cursor-pointer hover:text-3xl hover:text-red-600 transition-all duration-100 ease-in-out shadow-rt hover:shadow-rb;
+  @apply py-1 px-2 bg-red-300 md:pt-2 md:px-3 rounded-full sm:rounded-b-none sm:rounded-t-3xl cursor-pointer hover:scale-110  hover:text-red-700 transition-all duration-100 ease-in-out shadow-rt hover:shadow-rb hover:bg-red-200 text-center;
 }
 </style>

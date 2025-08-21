@@ -26,6 +26,16 @@ const router = createRouter({
           name: 'shoplist',
           component: () => import('@/views/ShopListView.vue'),
         },
+        {
+          path: 'createlist',
+          name: 'shoplist-create',
+          component: () => import('@/components/ShopListPage/ShopListDetail.vue'),
+        },
+        {
+          path: 'addlist',
+          name: 'shoplist-add',
+          component: () => import('@/components/ShopListPage/AddList.vue'),
+        },
         { path: 'fridge', name: 'fridge', component: () => import('@/views/FridgePageView.vue') },
         {
           path: 'shortdated',

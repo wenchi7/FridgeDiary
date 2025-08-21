@@ -9,7 +9,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <header class="font-chenyu">
+  <header class="font-chenyu font-medium">
     <router-view></router-view>
   </header>
 </template>
