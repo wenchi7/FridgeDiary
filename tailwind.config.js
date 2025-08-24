@@ -14,6 +14,7 @@ export default {
         MyColor: {
           purple: '#9297C8',
           yellow: '#FBE7AB',
+          pearl: '#C7DEEE',
         },
       },
       screens: {
