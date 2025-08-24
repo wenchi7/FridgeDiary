@@ -72,7 +72,7 @@ const listform = ref({
   expiryDate: '',
 })
 
-const units = ['顆', '罐', '袋', '隻', '盒', '組', '條', '包', '個', '毫升', '公克']
+const units = ['顆', '罐', '瓶', '袋', '隻', '盒', '組', '條', '包', '個', '碗', '毫升', '公克']
 const onSubmit = () => {
   emit('addInfo', { ...listform.value })
   listform.value = {
