@@ -36,16 +36,17 @@
               <li
                 v-for="(item, index) in items"
                 :key="index"
-                class="grid sm:grid-cols-[35px_150px_80px_80px_auto_35px] grid-cols-[35px_auto_70px_70px_20px] border-b border-stone-700 mt-4"
+                class="grid sm:grid-cols-[35px_150px_90px_95px_auto_35px] grid-cols-[35px_auto_80px_80px_20px] border-b border-stone-700 mt-4"
               >
                 <span>{{ index + 1 }}.</span>
                 <span class="text-start">{{ item.name }}</span>
-                <span class="text-center">{{ item.quantity }} {{ item.unit }} </span>
-                <span class="text-center">{{ item.price }}元</span>
-                <span class="hidden sm:block w-52 text-center">到期日{{ item.expiryDate }}</span>
+                <span class="text-end">{{ item.quantity }} {{ item.unit }} </span>
+                <span class="text-end">{{ item.price }}元</span>
+                <span class="hidden sm:block w-52 text-end">到期日{{ item.expiryDate }}</span>
                 <button type="button" @click="handleCancelAdd(index)" class="text-end">X</button>
               </li>
             </ul>
+            <p class="mt-4 text-end">總共 {{ total }} 元</p>
             <div class="mt-20 w-full flex justify-end">
               <button class="flex items-center gap-1 group" type="submit">
                 <span class="inline-block transition-transform group-hover:rotate-12">✏️</span>
@@ -61,14 +62,14 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import AddList from './AddList.vue'
 import { useAuthStore } from '@/stores/authStore'
 import { collection, addDoc } from 'firebase/firestore'
 import { db } from '@/firebase/init'
 const showAdd = ref(false)
 const items = ref([])
-
+const total = computed(() => items.value.reduce((sum, item) => sum + Number(item.price || 0), 0))
 const listInfo = ref({
   title: '',
 })
@@ -79,6 +80,7 @@ const handleAddShopList = async () => {
   const shoplistRef = await addDoc(collection(db, `users/${userId}/shoplists`), {
     title: listInfo.value.title,
     createdAt: new Date(),
+    total: total.value,
     ingredientsSummary: items.value.map((item) => item.name),
   })
   const shoplistId = shoplistRef.id
