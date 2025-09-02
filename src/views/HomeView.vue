@@ -1,7 +1,9 @@
 <template>
   <main class="h-dvh w-full">
     <div class="flex flex-col h-full">
-      <div class="relative w-full h-1/6 bg-MyColor-purple flex flex-col flex-shrink-0">
+      <div
+        class="fixed top-0 left-0 w-full h-40 z-30 bg-MyColor-purple flex flex-col flex-shrink-0"
+      >
         <button
           @click="handleLogOut"
           class="absolute right-2 w-32 py-4 px-8 text-pink-800 text-2xl font-semibold hover:text-red-500 cursor-pointer"
@@ -34,7 +36,7 @@
           </ul>
         </nav>
       </div>
-      <div class="w-full bg-MyColor-yellow flex-1 z-10">
+      <div class="pt-40 w-full bg-MyColor-yellow flex-1 z-10">
         <router-view></router-view>
       </div>
     </div>
