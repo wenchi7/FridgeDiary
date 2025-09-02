@@ -63,23 +63,24 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import AddList from './AddList.vue'
+import AddList from './AddListingredient.vue'
 import { useAuthStore } from '@/stores/authStore'
-import { collection, addDoc } from 'firebase/firestore'
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '@/firebase/init'
+import { useRouter } from 'vue-router'
 const showAdd = ref(false)
 const items = ref([])
 const total = computed(() => items.value.reduce((sum, item) => sum + Number(item.price || 0), 0))
 const listInfo = ref({
   title: '',
 })
-
+const router = useRouter()
 const handleAddShopList = async () => {
   const authStore = useAuthStore()
   const userId = authStore.user.id
   const shoplistRef = await addDoc(collection(db, `users/${userId}/shoplists`), {
     title: listInfo.value.title,
-    createdAt: new Date(),
+    createdAt: serverTimestamp(),
     total: total.value,
     ingredientsSummary: items.value.map((item) => item.name),
   })
@@ -90,6 +91,7 @@ const handleAddShopList = async () => {
   }
   listInfo.value.title = ''
   items.value = []
+  router.push({ name: 'shoplist' })
 }
 
 const showAddPage = () => {
