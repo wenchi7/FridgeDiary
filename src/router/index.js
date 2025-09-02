@@ -29,12 +29,12 @@ const router = createRouter({
         {
           path: 'createlist',
           name: 'shoplist-create',
-          component: () => import('@/components/ShopListPage/ShopListDetail.vue'),
+          component: () => import('@/components/ShopListPage/AddShopListDetail.vue'),
         },
         {
           path: 'addlist',
           name: 'shoplist-add',
-          component: () => import('@/components/ShopListPage/AddList.vue'),
+          component: () => import('@/components/ShopListPage/AddListingredient.vue'),
         },
         { path: 'fridge', name: 'fridge', component: () => import('@/views/FridgePageView.vue') },
         {
@@ -42,11 +42,16 @@ const router = createRouter({
           name: 'shortdated',
           component: () => import('@/views/ShortDatedView.vue'),
         },
-        { path: 'cookbook', name: 'cookbook', component: () => import('@/views/CookBook.vue') },
+        { path: 'cookbook', name: 'cookbook', component: () => import('@/views/CookBookView.vue') },
         {
           path: 'mycookbook',
           name: 'mycookbook',
           component: () => import('@/views/MyCookBookView.vue'),
+        },
+        {
+          path: 'listview/:id',
+          name: 'listview',
+          component: () => import('@/views/ListView.vue'),
         },
       ],
     },

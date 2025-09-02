@@ -57,7 +57,7 @@ const handleLogIn = async () => {
       await auth.signOut()
       return
     }
-    router.push({ name: 'home' })
+    router.push({ name: 'shoplist' })
     const userDocRef = doc(db, 'users', user.uid)
     const userDocSnap = await getDoc(userDocRef)
     if (!userDocSnap.exists()) {
