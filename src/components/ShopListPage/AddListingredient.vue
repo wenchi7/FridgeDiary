@@ -23,7 +23,7 @@
           id="quantity"
           v-model.number="listform.quantity"
           min="1"
-          class="px-4 w-1/4"
+          class="px-4 w-2/5"
           required
         />
         <select v-model="listform.unit" id="unit" class="text-xl ml-4" required>
@@ -39,8 +39,7 @@
           id="price"
           v-model.number="listform.price"
           min="0"
-          placeholder="請填寫價格"
-          class="px-4 w-1/4"
+          class="px-4 w-2/5"
           required
         />
         <p class="ml-4">元</p>
@@ -72,7 +71,24 @@ const listform = ref({
   expiryDate: '',
 })
 
-const units = ['顆', '罐', '瓶', '袋', '隻', '盒', '組', '條', '包', '個', '碗', '毫升', '公克']
+const units = [
+  '顆',
+  '罐',
+  '杯',
+  '瓶',
+  '袋',
+  '卷',
+  '隻',
+  '盒',
+  '組',
+  '條',
+  '包',
+  '個',
+  '碗',
+  '塊',
+  '毫升',
+  '公克',
+]
 const onSubmit = () => {
   emit('addInfo', { ...listform.value })
   listform.value = {

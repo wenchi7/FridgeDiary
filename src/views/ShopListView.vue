@@ -1,11 +1,13 @@
 <template>
-  <div class="flex flex-col mt-4">
-    <button
-      @click="createList"
-      class="flex justify-center items-center font-semibold text-slate-900 px-2 py-1 mx-auto bg-red-500 hover:bg-red-600 w-36 border border-black rounded-full my-4 text-2xl md:text-3xl"
-    >
-      新增明細
-    </button>
+  <div class="flex flex-col mt-4 w-full">
+    <div class="flex justify-center">
+      <button
+        @click="createList"
+        class="flex justify-center items-center font-medium text-gray-800 px-2 py-1 mx-auto bg-red-500 hover:bg-red-600 w-36 border border-black rounded-full mt-7 mb-4 text-2xl md:text-3xl"
+      >
+        新增明細
+      </button>
+    </div>
     <div>
       <ShopList />
     </div>

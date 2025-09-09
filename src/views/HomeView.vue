@@ -2,7 +2,7 @@
   <main class="h-dvh w-full">
     <div class="flex flex-col h-full">
       <div
-        class="fixed top-0 left-0 w-full h-40 z-30 bg-MyColor-purple flex flex-col flex-shrink-0"
+        class="fixed top-0 left-0 w-full h-28 sm:h-32 z-30 bg-MyColor-purple flex flex-col flex-shrink-0"
       >
         <button
           @click="handleLogOut"
@@ -36,7 +36,7 @@
           </ul>
         </nav>
       </div>
-      <div class="pt-40 w-full bg-MyColor-yellow flex-1 z-10">
+      <div class="pt-32 w-full bg-MyColor-yellow flex-1 z-10">
         <router-view></router-view>
       </div>
     </div>
@@ -64,6 +64,6 @@ const handleCloseMenu = () => {
 
 <style scoped lang="postcss">
 .nav-btn {
-  @apply py-1 px-2 bg-red-300 md:pt-2 md:px-3 rounded-full sm:rounded-b-none sm:rounded-t-3xl cursor-pointer hover:scale-110  hover:text-red-700 transition-all duration-100 ease-in-out shadow-rt hover:shadow-rb hover:bg-red-200 text-center;
+  @apply py-1 px-2 bg-red-300 md:pt-2 md:px-3 rounded-full sm:rounded-b-none sm:rounded-t-3xl cursor-pointer hover:scale-105  hover:text-red-700 transition-all duration-100 ease-in-out shadow-rt hover:shadow-rb hover:bg-red-200 text-center;
 }
 </style>
