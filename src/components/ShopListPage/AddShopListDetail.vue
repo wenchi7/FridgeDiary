@@ -2,7 +2,7 @@
   <div>
     <div class="flex w-full justify-center">
       <form
-        class="p-5 mt-4 sm:m-10 text-xl md:text-2xl lg:text-3xl transition-all uration-100 ease-in-out"
+        class="p-10 mt-4 sm:mt-10 text-xl md:text-2xl lg:text-3xl transition-all uration-100 ease-in-out w-full"
         @submit.prevent="handleAddShopList(listInfo)"
       >
         <div class="mb-4 flex items-center">
@@ -36,19 +36,39 @@
               <li
                 v-for="(item, index) in items"
                 :key="index"
-                class="grid sm:grid-cols-[35px_150px_90px_95px_auto_35px] grid-cols-[35px_auto_80px_80px_20px] border-b border-stone-700 mt-4"
+                class="border-b border-stone-700 grid grid-cols-[auto_20px] my-4"
               >
-                <span>{{ index + 1 }}.</span>
-                <span class="text-start">{{ item.name }}</span>
-                <span class="text-end">{{ item.quantity }} {{ item.unit }} </span>
-                <span class="text-end">{{ item.price }}元</span>
-                <span class="hidden sm:block w-52 text-end">到期日{{ item.expiryDate }}</span>
-                <button type="button" @click="handleCancelAdd(index)" class="text-end">X</button>
+                <div class="flex flex-col sm:flex-row gap-4">
+                  <div
+                    class="grid sm:grid-cols-[30px_210px_80px_95px] grid-cols-[30px_auto_80px_80px] mt-4 sm:mt-0"
+                  >
+                    <span>{{ index + 1 }}.</span>
+                    <span
+                      class="text-start underline underline-offset-4 decoration-slice sm:no-underline"
+                      >{{ item.name }}</span
+                    >
+                    <span class="text-end">{{ item.quantity }} {{ item.unit }} </span>
+                    <span class="text-end">{{ item.price }}元</span>
+                  </div>
+                  <div class="w-full text-start sm:text-center text-red-900 ml-7">
+                    <span>到期日</span>
+                    <span class="whitespace-nowrap">{{ item.expiryDate }}</span>
+                  </div>
+                </div>
+                <div class="flex items-center">
+                  <button type="button" @click="handleCancelAdd(index)" class="absolute right-0">
+                    X
+                  </button>
+                </div>
               </li>
             </ul>
             <p class="mt-4 text-end">總共 {{ total }} 元</p>
             <div class="mt-20 w-full flex justify-end">
-              <button class="flex items-center gap-1 group" type="submit">
+              <button
+                class="flex items-center gap-1 group disabled:bg-slate-500"
+                type="submit"
+                :disabled="isSubmitting"
+              >
                 <span class="inline-block transition-transform group-hover:rotate-12">✏️</span>
                 <span>完成</span>
               </button>
@@ -70,12 +90,16 @@ import { db } from '@/firebase/init'
 import { useRouter } from 'vue-router'
 const showAdd = ref(false)
 const items = ref([])
+const isSubmitting = ref(false)
+const router = useRouter()
 const total = computed(() => items.value.reduce((sum, item) => sum + Number(item.price || 0), 0))
+
 const listInfo = ref({
   title: '',
 })
-const router = useRouter()
+
 const handleAddShopList = async () => {
+  isSubmitting.value = true
   const authStore = useAuthStore()
   const userId = authStore.user.id
   const shoplistRef = await addDoc(collection(db, `users/${userId}/shoplists`), {
@@ -84,11 +108,13 @@ const handleAddShopList = async () => {
     total: total.value,
     ingredientsSummary: items.value.map((item) => item.name),
   })
+
   const shoplistId = shoplistRef.id
   const ingredientsRef = collection(db, `users/${userId}/shoplists/${shoplistId}/ingredients`)
   for (const ingredient of items.value) {
     await addDoc(ingredientsRef, ingredient)
   }
+
   listInfo.value.title = ''
   items.value = []
   router.push({ name: 'shoplist' })
@@ -97,6 +123,7 @@ const handleAddShopList = async () => {
 const showAddPage = () => {
   showAdd.value = !showAdd.value
 }
+
 const handleAddInfo = (newItem) => {
   items.value.push(newItem)
   showAdd.value = false
@@ -105,6 +132,7 @@ const handleAddInfo = (newItem) => {
 const handleClose = () => {
   showAdd.value = false
 }
+
 const handleCancelAdd = (index) => {
   items.value.splice(index, 1)
 }
