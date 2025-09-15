@@ -27,6 +27,12 @@ const router = createRouter({
           component: () => import('@/views/ShopListView.vue'),
         },
         {
+          path: 'createlist/:id',
+          name: 'shoplist-edit',
+          component: () => import('@/components/ShopListPage/AddShopListDetail.vue'),
+          props: true,
+        },
+        {
           path: 'createlist',
           name: 'shoplist-create',
           component: () => import('@/components/ShopListPage/AddShopListDetail.vue'),

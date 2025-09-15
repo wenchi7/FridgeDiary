@@ -30,7 +30,7 @@ export const useAuthStore = defineStore('auth', () => {
   const logOut = async () => {
     try {
       await signOut(auth)
-      // localStorage.removeItem('loginUser')
+
       user.value = null
       router.replace('/')
       console.log('登出了')

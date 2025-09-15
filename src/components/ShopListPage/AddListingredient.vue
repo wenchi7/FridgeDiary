@@ -13,6 +13,7 @@
           placeholder="請輸入品項名稱"
           list="nameSuggestions"
           class="placeholder:px-2 px-2 w-2/3"
+          maxlength="10"
           required
         />
       </div>

@@ -21,6 +21,6 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 
 const createList = () => {
-  router.push('/home/createlist')
+  router.push({ name: 'shoplist-create' })
 }
 </script>

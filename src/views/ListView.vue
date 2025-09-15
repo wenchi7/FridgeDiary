@@ -32,73 +32,56 @@
     </button>
 
     <div class="flex flex-col w-full mb-24">
-      <h2 class="text-xl md:text-2xl lg:text-3xl font-semibold text-center mt-6 mx-2">
+      <h2 class="text-xl md:text-2xl lg:text-3xl text-center mt-6 mx-2">
         {{ list.title }}
       </h2>
-      <span class="text-end mx-16 mt-4 text-md md:text-lg lg:text-xl">{{
+      <span class="text-end mx-16 mt-4 text-lg md:text-xl lg:text-2xl">{{
         formatDate(list.createdAt)
       }}</span>
+
       <div
-        class="relative p-5 mt-2 m-6 sm:m-10 text-xl md:text-2xl lg:text-3xl transition-all uration-100 ease-in-out"
+        class="relative p-5 mt-2 m-6 sm:m-10 text-xl md:text-2xl lg:text-3xl transition-all duration-100 ease-in-out"
       >
         <ul>
           <li
             v-for="(item, index) in list.ingredients"
             :key="index"
-            class="sm:grid sm:grid-cols-[230px_auto] flex flex-col border-b border-stone-700 mt-4"
+            class="sm:grid sm:grid-cols-[280px_auto] lg:grid-cols-[400px_auto] flex flex-col border-b border-stone-700 mt-4"
           >
-            <div class="flex flex-row sm:block items-center mb-5 sm:mb-0">
-              <span v-if="!isEditting">{{ index + 1 }}.</span>
-              <button v-else @click="handleCancelItem(index)" class="hover:text-red-500">X</button>
+            <div class="flex flex-row sm:block items-center mb-3 sm:mb-0">
+              <span>{{ index + 1 }}.</span>
 
-              <span class="text-start ml-4 mr-auto truncate">{{ item.name }}</span>
+              <span class="text-center ml-4">{{ item.name }}</span>
             </div>
-            <div
-              class="flex sm:grid sm:grid-cols-[170px_auto] md:grid-cols-[200px_auto] justify-between items-center px-6"
-            >
-              <div class="sm:flex sm:justify-around grid grid-cols-[70px_50px] w-full gap-2">
-                <span class="text-start">{{ item.quantity }}{{ item.unit }} </span>
-                <span class="text-start">{{ item.price }}元</span>
+
+            <div class="flex justify-between sm:flex px-2 mb-2">
+              <div class="flex w-full gap-4 sm:grid sm:grid-cols-2 sm:ml-2">
+                <span class="leading-none"
+                  >{{ item.quantity }}
+                  <span class="whitespace-nowrap text-base md:text-2xl lg:text-3xl">{{
+                    item.unit
+                  }}</span>
+                </span>
+                <span class="text-base md:text-2xl lg:text-3xl">{{ item.price }}元</span>
               </div>
-              <div class="w-full text-end sm:text-center">
+              <div class="leading-none text-center ml-3">
                 <span class="text-red-700">到期日</span>
+
                 <span class="whitespace-nowrap text-red-700"> {{ item.expiryDate }}</span>
               </div>
             </div>
           </li>
         </ul>
-        <button
-          v-if="isEditting"
-          class="mt-4 border rounded-lg border-gray-800"
-          @click="addIngredient"
-        >
-          ＋ 增加品項
-        </button>
-        <AddListingredient v-if="showAdd" />
+
         <p class="mt-4 text-end">總金額：{{ list.total }} 元</p>
         <button
           class="absolute -bottom-12 left-5 text-xl md:text-2xl lg:text-3xl hover:scale-95 rounded-2xl px-1 group"
           @click="editList"
-          v-if="!isEditting"
         >
           <span class="flex"
             ><p class="group-hover:rotate-12 mr-1">✏️</p>
             <p class="underline decoration-wavy decoration-red-500 underline-offset-4">修改</p>
           </span>
-        </button>
-        <button
-          v-else
-          class="absolute -bottom-12 left-5 text-xl md:text-2xl lg:text-3xl hover:scale-95 rounded-2xl px-1 group"
-          @click="handleEditUpload"
-        >
-          ✔ 完成
-        </button>
-        <button
-          v-if="isEditting"
-          @click="canceldelete"
-          class="absolute -bottom-12 right-5 text-red-600 hover:text-red-700"
-        >
-          X 取消編輯
         </button>
       </div>
     </div>
@@ -106,7 +89,6 @@
 </template>
 
 <script setup>
-import AddListingredient from '@/components/ShopListPage/AddListingredient.vue'
 import { db } from '@/firebase/init'
 import { useAuthStore } from '@/stores/authStore'
 import { doc, getDoc, collection, getDocs } from 'firebase/firestore'
@@ -119,12 +101,13 @@ const authStore = useAuthStore()
 const userId = authStore.user.id
 const route = useRoute()
 const router = useRouter()
-const isEditting = ref(false)
-const showAdd = ref(false)
+const listId = route.params.id
+
 const fetchListInfo = async () => {
-  const listId = route.params.id
   const listRef = doc(db, `users/${userId}/shoplists/${listId}`)
+
   const listSnap = await getDoc(listRef)
+
   if (listSnap.exists()) {
     const listData = { id: listSnap.id, ...listSnap.data(), ingredients: [] }
     const ingredientsRef = collection(db, `users/${userId}/shoplists/${listId}/ingredients`)
@@ -155,28 +138,7 @@ const formatDate = (timestamp) => {
   return date.toLocaleDateString('zh-TW', options)
 }
 const editList = async () => {
-  isEditting.value = true
-}
-const canceldelete = async () => {
-  await fetchListInfo()
-  isEditting.value = false
-}
-const addIngredient = () => {
-  showAdd.value = !showAdd.value
-  // list.value.ingredients.push({
-
-  // })
-}
-const handleCancelItem = (index) => {
-  const name = list.value.ingredients[index].name
-  if (window.confirm(`確定要刪除 ${name} 嗎？`)) {
-    list.value.ingredients.splice(index, 1)
-  }
-}
-const handleEditUpload = async () => {
-  setTimeout(() => {
-    isEditting.value = false
-  }, 500)
+  router.push({ name: 'shoplist-edit', params: { id: listId } })
 }
 
 onMounted(() => fetchListInfo())

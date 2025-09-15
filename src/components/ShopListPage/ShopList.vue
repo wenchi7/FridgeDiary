@@ -36,18 +36,18 @@
       v-for="list in lists"
       :key="list.id"
       :to="{ name: 'listview', params: { id: list.id } }"
-      class="relative group border-0 border-stone-600 text-xl md:text-2xl lg:text-3xl bg-MyColor-pearl shadow-[30px_40px_25px_-20px_rgba(0,0,0,0.5)] h-96 p-6 mx-auto w-11/12 max-w-sm md:mx-0 md:w-auto md:max-w-none"
+      class="relative group border-0 border-stone-600 text-xl md:text-2xl lg:text-3xl bg-MyColor-pearl shadow-[30px_40px_25px_-20px_rgba(0,0,0,0.5)] h-96 p-7 mx-auto w-11/12 max-w-sm md:mx-0 md:w-auto md:max-w-none hover:origin-top hover:rotate-1 transition-all ease-in-out duration-300 hover:shadow-[30px_40px_30px_-10px_rgba(0,0,0,0.5)]"
     >
       <ul class="mb-4">
         <li>
-          <h2 class="text-center mb-3 truncate w-40 sm:w-56 mx-auto">{{ list.title }}</h2>
+          <h2 class="text-center mb-3 truncate w-56 mx-auto">{{ list.title }}</h2>
         </li>
         <li
           v-for="(ingredient, index) in list.ingredientsSummary.slice(0, 4)"
           :key="index"
-          class="grid sm:grid-cols-[35px_auto] grid-cols-[35px_auto] border-b-2 border-black mb-2"
+          class="grid grid-cols-[30px_auto] border-b-2 border-black mb-2"
         >
-          <span>{{ index + 1 }}</span>
+          <span>{{ index + 1 }}.</span>
           <p class="truncate">{{ ingredient }}</p>
         </li>
         <li>
