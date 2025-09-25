@@ -2,7 +2,7 @@
   <div>
     <div class="flex w-full justify-center">
       <form
-        class="p-10 mt-2 sm:mt-10 text-xl md:text-2xl lg:text-3xl transition-all uration-100 ease-in-out w-full"
+        class="p-6 mt-2 sm:mt-10 text-xl md:text-2xl lg:text-3xl transition-all uration-100 ease-in-out w-full"
         @submit.prevent="handleAddShopList(listInfo)"
       >
         <div class="mb-4 flex items-center">
@@ -57,39 +57,69 @@
               </svg>
             </span>
           </div>
+
           <div
-            class="p-1 mt-4 m-3 sm:m-10 text-xl md:text-2xl lg:text-3xl transition-all duration-100 ease-in-out"
+            class="p-2 mt-4 m-3 sm:m-6 text-xl md:text-2xl lg:text-3xl transition-all duration-100 ease-in-out"
           >
             <ul>
               <li
                 v-for="(item, index) in items"
                 :key="index"
-                class="sm:grid sm:grid-cols-[280px_auto] lg:grid-cols-[400px_auto] flex flex-col border-b border-stone-700 mt-4"
+                class="sm:grid sm:grid-cols-[240px_auto] lg:grid-cols-[350px_auto] flex flex-col border-b border-stone-700 mt-4"
               >
-                <div class="flex flex-row sm:block items-center mb-3 sm:mb-0">
+                <div class="flex items-start mb-3 sm:mb-0">
                   <span>{{ index + 1 }}.</span>
 
-                  <span class="text-start ml-4">{{ item.name }}</span>
+                  <span class="text-start ml-4 block break-words sm:max-w-[18ch]">{{
+                    item.name
+                  }}</span>
                 </div>
 
-                <div class="relative flex justify-between sm:flex px-2 mb-2">
-                  <div class="flex w-full gap-4 sm:grid sm:grid-cols-2">
-                    <span class="leading-none"
-                      >{{ item.quantity }}
-                      <span class="whitespace-nowrap text-base md:text-2xl lg:text-3xl">{{
-                        item.unit
-                      }}</span>
-                    </span>
-                    <span class="text-base md:text-2xl lg:text-3xl">{{ item.price }} 元</span>
+                <div class="relative px-3 mb-2 gap-5 flex justify-between sm:grid grid-cols-3">
+                  <div class="flex gap-2 justify-center">
+                    <div v-if="items[index].isEditing">
+                      <input
+                        v-model="items[index].quantity"
+                        type="number"
+                        min="0"
+                        class="border rounded px-1 w-20"
+                      />
+                    </div>
+                    <div v-else>
+                      {{ item.quantity }}
+                    </div>
+
+                    <span class="whitespace-nowrap"> {{ item.unit }}</span>
+                  </div>
+                  <div class="flex justify-center">
+                    <div v-if="items[index].isEditing">
+                      <input
+                        v-model="items[index].price"
+                        type="number"
+                        min="0"
+                        class="border rounded px-1 w-20"
+                      />
+                      <p>元</p>
+                    </div>
+                    <div v-else class="flex gap-2">
+                      {{ item.price }}
+                      <p>元</p>
+                    </div>
                   </div>
 
-                  <div class="leading-none text-center ml-3">
-                    <span class="text-red-700">到期日</span>
+                  <div class="text-center mr-3 flex flex-col items-center leading-none">
+                    <span class="whitespace-nowrap text-red-700">到期日</span>
                     <span class="whitespace-nowrap text-red-700"> {{ item.expiryDate }}</span>
                   </div>
                 </div>
-                <div class="absolute right-6 hover:text-red-500">
-                  <button type="button" @click="handleCancelAdd(index)">X</button>
+                <div class="absolute right-5 flex gap-5">
+                  <div class="hover:text-red-600" v-if="props.id">
+                    <button type="button" @click="toggleEditing(item.id)">✎</button>
+                  </div>
+
+                  <div class="hover:text-red-600">
+                    <button type="button" @click="handleCancelAdd(index)">X</button>
+                  </div>
                 </div>
               </li>
             </ul>
@@ -144,6 +174,7 @@ const showAdd = ref(false)
 const items = ref([])
 const isSubmitting = ref(false)
 const isLoading = ref(true)
+
 const router = useRouter()
 const disableInputOnEdit = computed(() => !!props.id)
 const total = computed(() => items.value.reduce((sum, item) => sum + Number(item.price || 0), 0))
@@ -152,35 +183,62 @@ const listInfo = ref({
   title: '',
 })
 const listId = props.id
+
 const handleAddShopList = async () => {
   isSubmitting.value = true
   const authStore = useAuthStore()
   const userId = authStore.user.id
+  const sortedItems = items.value.sort((a, b) => a.createdAt - b.createdAt)
 
   if (props.id) {
     const shoplistRef = doc(db, `users/${userId}/shoplists/${listId}`)
     await updateDoc(shoplistRef, {
-      total: total.value,
       updatedAt: serverTimestamp(),
-      ingredientsSummary: items.value.map((item) => item.name),
+      ingredientsSummary: sortedItems.map((item) => item.name),
     })
     const ingredientsRef = collection(db, `users/${userId}/shoplists/${listId}/ingredients`)
-    const oldSnap = await getDocs(ingredientsRef)
 
-    for (const ing of oldSnap.docs) await deleteDoc(ing.ref)
-    for (const ingredient of items.value) await addDoc(ingredientsRef, ingredient)
+    const oldSnap = await getDocs(ingredientsRef)
+    const oldIds = oldSnap.docs.map((doc) => doc.id)
+    const newIds = items.value.filter((item) => item.id).map((item) => item.id)
+
+    for (const id of oldIds) {
+      if (!newIds.includes(id)) {
+        const docRef = doc(db, `users/${userId}/shoplists/${listId}/ingredients/${id}`)
+        await deleteDoc(docRef)
+      }
+    }
+
+    for (const item of items.value) {
+      if (item.id) {
+        const docRef = doc(db, `users/${userId}/shoplists/${listId}/ingredients/${item.id}`)
+        await updateDoc(docRef, {
+          quantity: item.quantity,
+          price: item.price,
+        })
+      } else {
+        await addDoc(ingredientsRef, {
+          name: item.name,
+          quantity: item.quantity,
+          unit: item.unit,
+          price: item.price,
+          expiryDate: item.expiryDate,
+          createdAt: item.createdAt,
+        })
+      }
+    }
   } else {
     const shoplistRef = await addDoc(collection(db, `users/${userId}/shoplists`), {
       title: listInfo.value.title,
       createdAt: serverTimestamp(),
       total: total.value,
-      ingredientsSummary: items.value.map((item) => item.name),
+      ingredientsSummary: sortedItems.map((item) => item.name),
     })
 
     const shoplistId = shoplistRef.id
     const ingredientsRef = collection(db, `users/${userId}/shoplists/${shoplistId}/ingredients`)
     for (const ingredient of items.value) {
-      await addDoc(ingredientsRef, ingredient)
+      await addDoc(ingredientsRef, { ...ingredient, createdAt: ingredient.createdAt })
     }
 
     listInfo.value.title = ''
@@ -213,6 +271,12 @@ const handleCancelAdd = (index) => {
     items.value.splice(index, 1)
   }
 }
+const toggleEditing = (id) => {
+  const item = items.value.find((i) => i.id === id)
+  if (item) {
+    item.isEditing = !item.isEditing
+  }
+}
 
 onMounted(async () => {
   if (props.id) {
@@ -226,7 +290,7 @@ onMounted(async () => {
       const ingRef = collection(db, `users/${userId}/shoplists/${props.id}/ingredients`)
       const snap = await getDocs(ingRef)
       isLoading.value = false
-      items.value = snap.docs.map((doc) => doc.data())
+      items.value = snap.docs.map((doc) => ({ id: doc.id, ...doc.data(), isEditing: false }))
     }
   } else {
     isLoading.value = false
