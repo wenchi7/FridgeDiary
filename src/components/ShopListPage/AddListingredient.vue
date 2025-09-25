@@ -91,7 +91,7 @@ const units = [
   '公克',
 ]
 const onSubmit = () => {
-  emit('addInfo', { ...listform.value })
+  emit('addInfo', { ...listform.value, createdAt: Date.now() })
   listform.value = {
     name: '',
     quantity: 1,
