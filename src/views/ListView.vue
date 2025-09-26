@@ -38,7 +38,7 @@
       <span class="text-end mx-16 mt-4 text-lg md:text-xl lg:text-2xl">{{
         formatDate(list.createdAt)
       }}</span>
-      <span class="text-end mx-16 text-lg md:text-xl lg:text-2xl"
+      <span v-if="list.updatedAt" class="text-end mx-16 text-lg md:text-xl lg:text-2xl"
         >最後編輯 {{ formatDate(list.updatedAt) }}</span
       >
 
@@ -47,32 +47,34 @@
       >
         <ul>
           <li
-            v-for="(item, index) in list.ingredients"
+            v-for="(ingredient, index) in list.ingredients"
             :key="index"
             class="sm:grid sm:grid-cols-[240px_auto] lg:grid-cols-[350px_auto] flex flex-col border-b border-stone-700 mt-4"
           >
             <div class="flex items-start mb-3 sm:mb-0">
               <span>{{ index + 1 }}.</span>
 
-              <span class="text-start ml-4 block break-words sm:max-w-[18ch]">{{ item.name }}</span>
+              <span class="text-start ml-4 block break-words sm:max-w-[18ch]">{{
+                ingredient.name
+              }}</span>
             </div>
 
             <div class="relative px-3 mb-2 gap-5 flex justify-between sm:grid sm:grid-cols-3">
               <div class="flex gap-2 justify-center">
                 <span class="leading-none"
-                  >{{ item.quantity }}
+                  >{{ ingredient.quantity }}
                   <span class="whitespace-nowrap text-base md:text-2xl lg:text-3xl">{{
-                    item.unit
+                    ingredient.unit
                   }}</span>
                 </span>
               </div>
               <div class="flex justify-center">
-                <span class="text-base md:text-2xl lg:text-3xl">{{ item.price }} 元</span>
+                <span class="text-base md:text-2xl lg:text-3xl">{{ ingredient.price }} 元</span>
               </div>
               <div class="text-center mr-3 flex flex-col items-center leading-none">
                 <span class="whitespace-nowrap text-red-700">到期日</span>
 
-                <span class="whitespace-nowrap text-red-700"> {{ item.expiryDate }}</span>
+                <span class="whitespace-nowrap text-red-700"> {{ ingredient.expiryDate }}</span>
               </div>
             </div>
           </li>
@@ -134,7 +136,7 @@
 <script setup>
 import { db } from '@/firebase/init'
 import { useAuthStore } from '@/stores/authStore'
-import { doc, getDoc, collection, getDocs, writeBatch } from 'firebase/firestore'
+import { doc, getDoc, collection, getDocs, writeBatch, query, where } from 'firebase/firestore'
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -195,6 +197,20 @@ const handleCancelList = async () => {
     const ingredientsSnap = await getDocs(ingredientsRef)
     const batch = writeBatch(db)
     ingredientsSnap.docs.forEach((docSnap) => {
+      batch.delete(docSnap.ref)
+    })
+
+    const ingredientsStockRef = collection(db, `users/${userId}/stocks`)
+    const relatedStockQuery = query(
+      ingredientsStockRef,
+      where(
+        'shoplistIngredientId',
+        'in',
+        ingredientsSnap.docs.map((doc) => doc.id),
+      ),
+    )
+    const relatedStockSnap = await getDocs(relatedStockQuery)
+    relatedStockSnap.docs.forEach((docSnap) => {
       batch.delete(docSnap.ref)
     })
 

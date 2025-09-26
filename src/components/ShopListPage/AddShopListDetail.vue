@@ -63,7 +63,7 @@
           >
             <ul>
               <li
-                v-for="(item, index) in items"
+                v-for="(ingredient, index) in ingredients"
                 :key="index"
                 class="sm:grid sm:grid-cols-[240px_auto] lg:grid-cols-[350px_auto] flex flex-col border-b border-stone-700 mt-4"
               >
@@ -71,30 +71,30 @@
                   <span>{{ index + 1 }}.</span>
 
                   <span class="text-start ml-4 block break-words sm:max-w-[18ch]">{{
-                    item.name
+                    ingredient.name
                   }}</span>
                 </div>
 
                 <div class="relative px-3 mb-2 gap-5 flex justify-between sm:grid grid-cols-3">
                   <div class="flex gap-2 justify-center">
-                    <div v-if="items[index].isEditing">
+                    <div v-if="ingredients[index].isEditing">
                       <input
-                        v-model="items[index].quantity"
+                        v-model="ingredients[index].quantity"
                         type="number"
                         min="0"
                         class="border rounded px-1 w-20"
                       />
                     </div>
                     <div v-else>
-                      {{ item.quantity }}
+                      {{ ingredient.quantity }}
                     </div>
 
-                    <span class="whitespace-nowrap"> {{ item.unit }}</span>
+                    <span class="whitespace-nowrap"> {{ ingredient.unit }}</span>
                   </div>
                   <div class="flex justify-center">
-                    <div v-if="items[index].isEditing">
+                    <div v-if="ingredients[index].isEditing">
                       <input
-                        v-model="items[index].price"
+                        v-model="ingredients[index].price"
                         type="number"
                         min="0"
                         class="border rounded px-1 w-20"
@@ -102,19 +102,19 @@
                       <p>元</p>
                     </div>
                     <div v-else class="flex gap-2">
-                      {{ item.price }}
+                      {{ ingredient.price }}
                       <p>元</p>
                     </div>
                   </div>
 
                   <div class="text-center mr-3 flex flex-col items-center leading-none">
                     <span class="whitespace-nowrap text-red-700">到期日</span>
-                    <span class="whitespace-nowrap text-red-700"> {{ item.expiryDate }}</span>
+                    <span class="whitespace-nowrap text-red-700"> {{ ingredient.expiryDate }}</span>
                   </div>
                 </div>
                 <div class="absolute right-5 flex gap-5">
                   <div class="hover:text-red-600" v-if="props.id">
-                    <button type="button" @click="toggleEditing(item.id)">✎</button>
+                    <button type="button" @click="toggleEditing(ingredient.id)">✎</button>
                   </div>
 
                   <div class="hover:text-red-600">
@@ -167,17 +167,21 @@ import {
   getDocs,
   deleteDoc,
   getDoc,
+  query,
+  where,
 } from 'firebase/firestore'
 import { db } from '@/firebase/init'
 import { useRouter } from 'vue-router'
 const showAdd = ref(false)
-const items = ref([])
+const ingredients = ref([])
 const isSubmitting = ref(false)
 const isLoading = ref(true)
 
 const router = useRouter()
 const disableInputOnEdit = computed(() => !!props.id)
-const total = computed(() => items.value.reduce((sum, item) => sum + Number(item.price || 0), 0))
+const total = computed(() =>
+  ingredients.value.reduce((sum, ingredient) => sum + Number(ingredient.price || 0), 0),
+)
 const props = defineProps({ id: String })
 const listInfo = ref({
   title: '',
@@ -188,42 +192,72 @@ const handleAddShopList = async () => {
   isSubmitting.value = true
   const authStore = useAuthStore()
   const userId = authStore.user.id
-  const sortedItems = items.value.sort((a, b) => a.createdAt - b.createdAt)
+  const sortedItems = ingredients.value.sort((a, b) => a.createdAt - b.createdAt)
 
   if (props.id) {
     const shoplistRef = doc(db, `users/${userId}/shoplists/${listId}`)
+    const stockRef = collection(db, `users/${userId}/stocks`)
+
     await updateDoc(shoplistRef, {
       updatedAt: serverTimestamp(),
-      ingredientsSummary: sortedItems.map((item) => item.name),
+      ingredientsSummary: sortedItems.map((ingredient) => ingredient.name),
     })
     const ingredientsRef = collection(db, `users/${userId}/shoplists/${listId}/ingredients`)
 
     const oldSnap = await getDocs(ingredientsRef)
     const oldIds = oldSnap.docs.map((doc) => doc.id)
-    const newIds = items.value.filter((item) => item.id).map((item) => item.id)
+    const newIds = ingredients.value
+      .filter((ingredient) => ingredient.id)
+      .map((ingredient) => ingredient.id)
 
     for (const id of oldIds) {
       if (!newIds.includes(id)) {
-        const docRef = doc(db, `users/${userId}/shoplists/${listId}/ingredients/${id}`)
-        await deleteDoc(docRef)
+        const ingredientDocRef = doc(db, `users/${userId}/shoplists/${listId}/ingredients/${id}`)
+        await deleteDoc(ingredientDocRef)
+
+        const stockQuery = query(stockRef, where('shoplistIngredientId', '==', id))
+        const stockSnap = await getDocs(stockQuery)
+        for (const stockDoc of stockSnap.docs) {
+          await deleteDoc(doc(db, `users/${userId}/stocks/${stockDoc.id}`))
+        }
       }
     }
 
-    for (const item of items.value) {
-      if (item.id) {
-        const docRef = doc(db, `users/${userId}/shoplists/${listId}/ingredients/${item.id}`)
-        await updateDoc(docRef, {
-          quantity: item.quantity,
-          price: item.price,
+    for (const ingredient of ingredients.value) {
+      if (ingredient.id) {
+        const ingredientDocRef = doc(
+          db,
+          `users/${userId}/shoplists/${listId}/ingredients/${ingredient.id}`,
+        )
+        await updateDoc(ingredientDocRef, {
+          quantity: ingredient.quantity,
+          price: ingredient.price,
         })
+        const stockQuery = query(stockRef, where('shoplistIngredientId', '==', ingredient.id))
+        const stockSnap = await getDocs(stockQuery)
+        for (const stockDoc of stockSnap.docs) {
+          await updateDoc(doc(db, `users/${userId}/stocks/${stockDoc.id}`), {
+            quantity: ingredient.quantity,
+            price: ingredient.price,
+          })
+        }
       } else {
-        await addDoc(ingredientsRef, {
-          name: item.name,
-          quantity: item.quantity,
-          unit: item.unit,
-          price: item.price,
-          expiryDate: item.expiryDate,
-          createdAt: item.createdAt,
+        const ingredientsRef = collection(db, `users/${userId}/shoplists/${listId}/ingredients`)
+        const docRef = await addDoc(ingredientsRef, {
+          ...ingredient,
+          createdAt: ingredient.createdAt,
+          deducted: ingredient.deducted ?? 0,
+        })
+
+        await addDoc(stockRef, {
+          name: ingredient.name,
+          quantity: ingredient.quantity,
+          unit: ingredient.unit,
+          price: ingredient.price,
+          expiryDate: ingredient.expiryDate,
+          deducted: ingredient.deducted ?? 0,
+          createdAt: ingredient.createdAt,
+          shoplistIngredientId: docRef.id,
         })
       }
     }
@@ -232,17 +266,32 @@ const handleAddShopList = async () => {
       title: listInfo.value.title,
       createdAt: serverTimestamp(),
       total: total.value,
-      ingredientsSummary: sortedItems.map((item) => item.name),
+      ingredientsSummary: sortedItems.map((ingredient) => ingredient.name),
     })
 
     const shoplistId = shoplistRef.id
     const ingredientsRef = collection(db, `users/${userId}/shoplists/${shoplistId}/ingredients`)
-    for (const ingredient of items.value) {
-      await addDoc(ingredientsRef, { ...ingredient, createdAt: ingredient.createdAt })
+    const stockRef = collection(db, `users/${userId}/stocks`)
+    for (const ingredient of ingredients.value) {
+      const docRef = await addDoc(ingredientsRef, {
+        ...ingredient,
+        createdAt: ingredient.createdAt,
+        deducted: ingredient.deducted,
+      })
+      await addDoc(stockRef, {
+        name: ingredient.name,
+        quantity: ingredient.quantity,
+        deducted: ingredient.deducted,
+        unit: ingredient.unit,
+        price: ingredient.price,
+        expiryDate: ingredient.expiryDate,
+        createdAt: ingredient.createdAt,
+        shoplistIngredientId: docRef.id,
+      })
     }
 
     listInfo.value.title = ''
-    items.value = []
+    ingredients.value = []
   }
   isSubmitting.value = false
   router.push({ name: 'shoplist' })
@@ -253,7 +302,7 @@ const showAddPage = () => {
 }
 
 const handleAddInfo = (newItem) => {
-  items.value.push(newItem)
+  ingredients.value.push(newItem)
   showAdd.value = false
 }
 
@@ -266,15 +315,15 @@ const handleCancelEdit = () => {
 }
 
 const handleCancelAdd = (index) => {
-  const name = items.value[index].name || ''
+  const name = ingredients.value[index].name || ''
   if (window.confirm(`確定要刪除${name}嗎？`)) {
-    items.value.splice(index, 1)
+    ingredients.value.splice(index, 1)
   }
 }
 const toggleEditing = (id) => {
-  const item = items.value.find((i) => i.id === id)
-  if (item) {
-    item.isEditing = !item.isEditing
+  const ingredient = ingredients.value.find((i) => i.id === id)
+  if (ingredient) {
+    ingredient.isEditing = !ingredient.isEditing
   }
 }
 
@@ -290,7 +339,7 @@ onMounted(async () => {
       const ingRef = collection(db, `users/${userId}/shoplists/${props.id}/ingredients`)
       const snap = await getDocs(ingRef)
       isLoading.value = false
-      items.value = snap.docs.map((doc) => ({ id: doc.id, ...doc.data(), isEditing: false }))
+      ingredients.value = snap.docs.map((doc) => ({ id: doc.id, ...doc.data(), isEditing: false }))
     }
   } else {
     isLoading.value = false
