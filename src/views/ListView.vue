@@ -136,7 +136,16 @@
 <script setup>
 import { db } from '@/firebase/init'
 import { useAuthStore } from '@/stores/authStore'
-import { doc, getDoc, collection, getDocs, writeBatch, query, where } from 'firebase/firestore'
+import {
+  doc,
+  getDoc,
+  collection,
+  getDocs,
+  writeBatch,
+  query,
+  where,
+  orderBy,
+} from 'firebase/firestore'
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -157,8 +166,8 @@ const fetchListInfo = async () => {
   if (listSnap.exists()) {
     const listData = { id: listSnap.id, ...listSnap.data(), ingredients: [] }
     const ingredientsRef = collection(db, `users/${userId}/shoplists/${listId}/ingredients`)
-
-    const ingredientsSnap = await getDocs(ingredientsRef)
+    const ingredientsQuery = query(ingredientsRef, orderBy('createdAt', 'asc'))
+    const ingredientsSnap = await getDocs(ingredientsQuery)
     listData.ingredients = ingredientsSnap.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),

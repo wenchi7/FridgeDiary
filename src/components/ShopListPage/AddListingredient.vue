@@ -70,6 +70,7 @@ const listform = ref({
   unit: '',
   price: 0,
   expiryDate: '',
+  deducted: 0,
 })
 
 const units = [
@@ -91,13 +92,14 @@ const units = [
   '公克',
 ]
 const onSubmit = () => {
-  emit('addInfo', { ...listform.value, createdAt: Date.now() })
+  emit('addInfo', { ...listform.value, createdAt: new Date() })
   listform.value = {
     name: '',
     quantity: 1,
     unit: '',
     price: 0,
     expiryDate: '',
+    deducted: 0,
   }
 }
 </script>

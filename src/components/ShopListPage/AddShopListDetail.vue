@@ -31,7 +31,7 @@
             </button>
           </div>
 
-          <AddList v-show="showAdd" @addInfo="handleAddInfo" @close="handleClose" />
+          <AddListingredient v-show="showAdd" @addInfo="handleAddInfo" @close="handleClose" />
 
           <div v-if="isLoading" class="flex justify-center mt-10">
             <span>
@@ -156,7 +156,6 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import AddList from './AddListingredient.vue'
 import { useAuthStore } from '@/stores/authStore'
 import {
   collection,
@@ -169,9 +168,11 @@ import {
   getDoc,
   query,
   where,
+  orderBy,
 } from 'firebase/firestore'
 import { db } from '@/firebase/init'
 import { useRouter } from 'vue-router'
+import AddListingredient from './AddListingredient.vue'
 const showAdd = ref(false)
 const ingredients = ref([])
 const isSubmitting = ref(false)
@@ -200,6 +201,7 @@ const handleAddShopList = async () => {
 
     await updateDoc(shoplistRef, {
       updatedAt: serverTimestamp(),
+      total: total.value,
       ingredientsSummary: sortedItems.map((ingredient) => ingredient.name),
     })
     const ingredientsRef = collection(db, `users/${userId}/shoplists/${listId}/ingredients`)
@@ -332,12 +334,12 @@ onMounted(async () => {
     const authStore = useAuthStore()
     const userId = authStore.user.id
     const mainRef = doc(db, `users/${userId}/shoplists/${props.id}`)
-
     const mainSnap = await getDoc(mainRef)
     if (mainSnap.exists()) {
       listInfo.value.title = mainSnap.data().title
       const ingRef = collection(db, `users/${userId}/shoplists/${props.id}/ingredients`)
-      const snap = await getDocs(ingRef)
+      const ingQuery = query(ingRef, orderBy('createdAt', 'asc'))
+      const snap = await getDocs(ingQuery)
       isLoading.value = false
       ingredients.value = snap.docs.map((doc) => ({ id: doc.id, ...doc.data(), isEditing: false }))
     }
