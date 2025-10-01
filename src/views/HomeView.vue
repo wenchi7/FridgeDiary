@@ -18,20 +18,30 @@
             class="absolute -top-2 sm:static sm:top-auto flex flex-col shadow-md sm:flex-row justify-around px-6 text-xl md:text-2xl lg:text-3xl space-y-2 sm:space-y-0 sm:space-x-4 mx-6 sm:mx-0 bg-slate-50/60 py-4 sm:py-0 sm:bg-transparent rounded-md"
             :class="{ hidden: !isOpen, block: isOpen, 'sm:flex': true }"
           >
-            <li class="nav-btn" @click="handleCloseMenu">
-              <router-link to="/home">採買日記</router-link>
+            <li>
+              <router-link to="/home" class="nav-btn" @click="handleCloseMenu"
+                >採買日記</router-link
+              >
             </li>
-            <li class="nav-btn" @click="handleCloseMenu">
-              <router-link to="/home/fridge">我的冰箱</router-link>
+            <li>
+              <router-link to="/home/fridge" class="nav-btn" @click="handleCloseMenu"
+                >我的冰箱</router-link
+              >
             </li>
-            <li class="nav-btn" @click="handleCloseMenu">
-              <router-link to="/home/shortdated">即期警戒區</router-link>
+            <li>
+              <router-link to="/home/shortdated" class="nav-btn" @click="handleCloseMenu"
+                >即期警戒區</router-link
+              >
             </li>
-            <li class="nav-btn" @click="handleCloseMenu">
-              <router-link to="/home/cookbook">想不到吃什麼</router-link>
+            <li>
+              <router-link to="/home/cookbook" class="nav-btn" @click="handleCloseMenu"
+                >想不到吃什麼</router-link
+              >
             </li>
-            <li class="nav-btn" @click="handleCloseMenu">
-              <router-link to="/home/mycookbook">分享區</router-link>
+            <li>
+              <router-link to="/home/mycookbook" class="nav-btn" @click="handleCloseMenu"
+                >分享區</router-link
+              >
             </li>
           </ul>
         </nav>
@@ -64,6 +74,6 @@ const handleCloseMenu = () => {
 
 <style scoped lang="postcss">
 .nav-btn {
-  @apply py-1 px-2 bg-red-300 md:pt-2 md:px-3 rounded-full sm:rounded-b-none sm:rounded-t-3xl cursor-pointer hover:scale-105  hover:text-red-700 transition-all duration-100 ease-in-out shadow-rt hover:shadow-rb hover:bg-red-200 text-center;
+  @apply block pt-2 px-2 bg-red-300 md:pt-2 md:px-3 rounded-full sm:rounded-b-none sm:rounded-t-3xl cursor-pointer hover:scale-105  hover:text-red-700 transition-all duration-100 ease-in-out shadow-rt hover:shadow-rb hover:bg-red-200 text-center;
 }
 </style>
