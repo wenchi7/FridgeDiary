@@ -10,7 +10,7 @@
       <li
         v-for="ingredient in ingredients"
         :key="ingredient.id"
-        class="relative sm:grid sm:grid-cols-[250px_auto] lg:grid-cols-[500px_auto] flex flex-col border-b border-stone-700 mt-2"
+        class="relative sm:grid sm:grid-cols-[250px_auto] md:grid-cols-[375px_auto] lg:grid-cols-[500px_auto] flex flex-col border-b border-stone-700 my-2 transition-all ease-out duration-300"
       >
         <div class="mb-3 sm:mb-0">
           <span class="text-start block break-words sm:max-w-[27ch]">。{{ ingredient.name }}</span>
@@ -26,18 +26,21 @@
             </span>
           </div>
 
-          <div class="text-center mr-3 flex flex-col items-start leading-none">
+          <div
+            class="text-center mr-3 flex flex-col items-end leading-none transition-all duration-300"
+            :class="{ 'sm:-translate-x-20': editingId === ingredient.id }"
+          >
             <span class="whitespace-nowrap text-red-700">到期日</span>
 
             <span class="whitespace-nowrap text-red-700"> {{ ingredient.expiryDate }}</span>
           </div>
         </div>
 
-        <div class="absolute right-5 sm:-right-8">
+        <div class="absolute right-5 sm:-right-8 top-0 sm:top-2">
           <div v-if="editingId !== ingredient.id">
             <button
               @click="startEditing(ingredient.id)"
-              class="rounded-lg hover:bg-zinc-300 flex justify-center items-center"
+              class="rounded-lg hover:bg-zinc-300 flex justify-center"
             >
               🔪
             </button>

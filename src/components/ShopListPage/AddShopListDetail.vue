@@ -13,7 +13,7 @@
             id="title"
             v-model="listInfo.title"
             class="flex-1 w-full sm:w-10/12 border border-stone-400 pl-2 disabled:bg-transparent disabled:border-transparent"
-            placeholder="請輸入清單標題  ex：8/8咖哩飯"
+            placeholdder="請輸入清單標題  ex：8/8咖哩飯"
             required
           />
         </div>
