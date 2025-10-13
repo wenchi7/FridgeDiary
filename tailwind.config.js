@@ -20,6 +20,15 @@ export default {
       screens: {
         xs: '360px',
       },
+      keyframes: {
+        'bg-pulse': {
+          '0%, 100%': { backgroundColor: '#fef2f2' }, // bg-red-100
+          '50%': { backgroundColor: '#fecaca' }, // bg-red-300
+        },
+      },
+      animation: {
+        'bg-pulse': 'bg-pulse 2s ease-in-out infinite',
+      },
     },
   },
   plugins: [],
