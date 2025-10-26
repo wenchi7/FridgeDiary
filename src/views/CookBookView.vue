@@ -52,20 +52,49 @@
 <script setup>
 import DrawCards from '@/components/CookBookPage/DrawCards.vue'
 import { db } from '@/firebase/init'
-import { doc, getDoc } from 'firebase/firestore'
-import { ref } from 'vue'
+import { useAuthStore } from '@/stores/authStore'
+import { doc, getDoc, setDoc } from 'firebase/firestore'
+import { onMounted, ref } from 'vue'
 
 const recipe = ref(null)
+const authStore = useAuthStore()
+const userId = authStore.user.id
+const today = new Date().toISOString().split('T')[0]
 
-const handleCardSelected = async (id) => {
-  console.log('卡片被點擊了！recipe.id:', id)
-  const recipeRef = doc(db, 'dailyRecipes', id)
-  const recipeSnap = await getDoc(recipeRef)
-  if (recipeSnap.exists()) {
-    recipe.value = recipeSnap.data()
-    console.log('選取的食譜內容：', recipe.value)
+const checkDailyRecipe = async () => {
+  const local = JSON.parse(localStorage.getItem('dailyRecipe'))
+  if (local?.date === today) {
+    recipe.value = local.recipe
+    return
   } else {
-    console.warn('找不到該食譜資料')
+    localStorage.removeItem('dailyRecipe')
+  }
+  const docRef = doc(db, 'users', userId, 'dailyRecipe', 'current')
+  const docSnap = await getDoc(docRef)
+  if (docSnap.exists() && docSnap.data().date === today) {
+    recipe.value = docSnap.data().recipe
+    localStorage.setItem('dailyRecipe', JSON.stringify({ date: today, recipe: recipe.value }))
+  } else {
+    recipe.value = null
   }
 }
+
+const handleCardSelected = async (id) => {
+  const recipeRef = doc(db, 'dailyRecipes', id)
+  const recipeSnap = await getDoc(recipeRef)
+  if (!recipeSnap.exists()) return
+
+  recipe.value = recipeSnap.data()
+
+  const userDocRef = doc(db, `users/${userId}/dailyRecipe/current`)
+  await setDoc(userDocRef, {
+    recipe: recipe.value,
+    date: today,
+  })
+  localStorage.setItem('dailyRecipe', JSON.stringify({ date: today, recipe: recipe.value }))
+}
+
+onMounted(() => {
+  checkDailyRecipe()
+})
 </script>
