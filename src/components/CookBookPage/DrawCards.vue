@@ -21,7 +21,7 @@
 <script setup>
 import { db } from '@/firebase/init'
 import { collection, getDocs } from 'firebase/firestore'
-import { defineEmits, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 const recipes = ref([])
 const fetchRecipes = async () => {
   try {
