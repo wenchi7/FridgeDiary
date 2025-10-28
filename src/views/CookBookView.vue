@@ -6,7 +6,7 @@
       <DrawCards @card-selected="handleCardSelected" />
     </div>
 
-    <div v-else class="mt-10 text-lg md:text-2xl lg:text-3xl">
+    <div v-else class="mt-10 text-xl md:text-2xl lg:text-3xl">
       <div class="flex flex-col sm:flex-row gap-10 mb-5 p-5 sm:p-4 items-center justify-start">
         <img v-if="recipe.image" :src="recipe.image" alt="recipe" class="w-72 h-auto" />
         <div>

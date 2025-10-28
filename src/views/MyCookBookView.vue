@@ -1,3 +1,3 @@
 <template>
-  <div>MyCookBookView</div>
+  <div>即將推出新功能！</div>
 </template>

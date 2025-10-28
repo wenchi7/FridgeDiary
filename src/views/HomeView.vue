@@ -38,11 +38,15 @@
                 >想不到吃什麼</router-link
               >
             </li>
-            <li>
-              <router-link to="/home/mycookbook" class="nav-btn" @click="handleCloseMenu"
-                >分享區</router-link
+            <!-- <li>
+              <router-link
+                to="/home/mycookbook"
+                class="nav-btn"
+                @click="handleCloseMenu"
+
+                >新功能</router-link
               >
-            </li>
+            </li> -->
           </ul>
         </nav>
       </div>
