@@ -30,7 +30,7 @@
   </div>
   <div
     v-else
-    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mx-8 md:mx-16 mt-6 mb-20 gap-16"
+    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mx-8 md:mx-16 mt-6 mb-40 gap-16"
   >
     <router-link
       v-for="list in lists"
@@ -64,7 +64,7 @@
       </ul>
     </router-link>
   </div>
-  <div class="flex justify-center mb-36" v-show="isLoadingMore">
+  <div class="flex justify-center mb-36" v-if="isLoadingMore">
     <span>
       <svg
         class="-ml-1 mr-3 h-10 w-10 animate-spin text-white"
@@ -87,6 +87,9 @@
         ></path>
       </svg>
     </span>
+  </div>
+  <div v-if="!hasMore" class="flex justify-center mb-36 text-xl md:text-2xl lg:text-3xl">
+    沒有更多的清單了。。。
   </div>
 </template>
 <script setup>
@@ -140,7 +143,7 @@ const fetchLists = async (isLoadMore = false) => {
   }
 }
 
-const listsPerPage = 7
+const listsPerPage = 6
 const isLoadingMore = ref(false)
 const hasMore = ref(true)
 
@@ -150,7 +153,7 @@ const checkScroll = async () => {
   const scrollHeight = document.scrollingElement.scrollHeight
   const scrollTop = document.scrollingElement.scrollTop
   const clientHeight = document.scrollingElement.clientHeight
-  if (scrollHeight - scrollTop - clientHeight < 200) {
+  if (scrollHeight - scrollTop - clientHeight < 300) {
     isLoadingMore.value = true
     await fetchLists(true)
     isLoadingMore.value = false
