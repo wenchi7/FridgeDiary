@@ -30,7 +30,7 @@
   </div>
   <div
     v-else
-    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mx-8 md:mx-16 mt-6 mb-32 gap-16"
+    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mx-8 md:mx-16 mt-6 mb-20 gap-16"
   >
     <router-link
       v-for="list in lists"
@@ -64,30 +64,104 @@
       </ul>
     </router-link>
   </div>
+  <div class="flex justify-center mb-36" v-show="isLoadingMore">
+    <span>
+      <svg
+        class="-ml-1 mr-3 h-10 w-10 animate-spin text-white"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          class="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          stroke-width="4"
+        ></circle>
+        <path
+          class="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+        ></path>
+      </svg>
+    </span>
+  </div>
 </template>
 <script setup>
-import { orderBy, query, collection, getDocs } from 'firebase/firestore'
+import { orderBy, query, collection, getDocs, limit, startAfter } from 'firebase/firestore'
 import { db } from '@/firebase/init'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 
 const lists = ref([])
 const authStore = useAuthStore()
 const userId = authStore.user.id
 const isLoading = ref(true)
-const fetchLists = async () => {
+const lastVisible = ref(null)
+const fetchLists = async (isLoadMore = false) => {
+  if (!isLoadMore) {
+    isLoading.value = true
+    lists.value = []
+    lastVisible.value = null
+    hasMore.value = true
+  }
   try {
-    let q = query(collection(db, `users/${userId}/shoplists`), orderBy('createdAt', 'desc'))
+    let q = query(
+      collection(db, `users/${userId}/shoplists`),
+      orderBy('createdAt', 'desc'),
+      limit(listsPerPage),
+    )
+    if (lastVisible.value) {
+      q = query(q, startAfter(lastVisible.value))
+    }
+
     const querySnapshot = await getDocs(q)
 
-    lists.value = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-    isLoading.value = false
+    if (!querySnapshot.empty) {
+      lastVisible.value = querySnapshot.docs[querySnapshot.docs.length - 1] ?? lastVisible.value
+      hasMore.value = querySnapshot.docs.length == listsPerPage
+
+      const newLists = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+      if (isLoadMore) {
+        lists.value = [...lists.value, ...newLists]
+      } else {
+        lists.value = newLists
+      }
+    } else {
+      hasMore.value = false
+    }
   } catch (error) {
     console.log(`發生錯誤，請重新送出${error.message}`)
+  } finally {
     isLoading.value = false
+    isLoadingMore.value = false
   }
 }
+
+const listsPerPage = 7
+const isLoadingMore = ref(false)
+const hasMore = ref(true)
+
+const checkScroll = async () => {
+  if (isLoading.value || isLoadingMore.value || !hasMore.value) return
+
+  const scrollHeight = document.scrollingElement.scrollHeight
+  const scrollTop = document.scrollingElement.scrollTop
+  const clientHeight = document.scrollingElement.clientHeight
+  if (scrollHeight - scrollTop - clientHeight < 200) {
+    isLoadingMore.value = true
+    await fetchLists(true)
+    isLoadingMore.value = false
+  }
+}
+
 onMounted(() => {
   fetchLists()
+  window.addEventListener('scroll', checkScroll)
+})
+onUnmounted(() => {
+  window.removeEventListener('scroll', checkScroll)
 })
 </script>
