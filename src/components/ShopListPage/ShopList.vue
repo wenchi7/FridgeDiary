@@ -88,7 +88,10 @@
       </svg>
     </span>
   </div>
-  <div v-if="!hasMore" class="flex justify-center mb-36 text-xl md:text-2xl lg:text-3xl">
+  <div
+    v-if="!hasMore && lists.length !== 0"
+    class="flex justify-center mb-36 text-xl md:text-2xl lg:text-3xl"
+  >
     沒有更多的清單了。。。
   </div>
 </template>
