@@ -67,34 +67,30 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
 
+  const handleNavigation = () => {
+    const isLoggedIn = !!authStore.user
+
+    if (isLoggedIn && to.name === 'login') {
+      next({ name: 'shoplist' })
+    } else if (to.meta.requiresAuth && !authStore.user) {
+      next({ name: 'login' })
+    } else {
+      next()
+    }
+  }
+
   if (!authStore.isAuthReady) {
     const stopWatch = watch(
       () => authStore.isAuthReady,
       (ready) => {
         if (ready) {
           stopWatch()
-          proceed()
+          handleNavigation()
         }
       },
     )
   } else {
-    proceed()
-  }
-
-  function proceed() {
-    if (to.meta.requiresAuth && !authStore.user) {
-      next({ name: 'login' })
-    } else {
-      next()
-    }
+    handleNavigation()
   }
 })
-
-// router.beforeEach((to) => {
-//   const authStore = useAuthStore()
-
-//   if (to.meta.requiresAuth && !authStore.user) {
-//     return { name: 'login' }
-//   }
-// })
 export default router
