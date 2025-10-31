@@ -26,7 +26,7 @@
           </div>
         </div>
         <div class="absolute right-5 sm:-right-8 top-0 sm:top-1">
-          <button @click="throwIngredient(ingredient.id)" :disabled="ingredientisThrowed">
+          <button @click="throwIngredient(ingredient.id)" :disabled="ingredient.isThrowed">
             🗑️
           </button>
         </div>
