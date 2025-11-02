@@ -24,7 +24,8 @@
             <button
               @click="showAddPage"
               type="button"
-              class="border border-slate-800 rounded-xl px-2 bg-red-300 bg-opacity-90 hover:bg-red-400 hover:bg-opacity-80"
+              :disabled="isSubmitting"
+              class="border border-slate-800 rounded-xl px-2 bg-red-300 bg-opacity-90 hover:bg-red-400 hover:bg-opacity-80 disabled:text-slate-500"
             >
               <span v-show="showAdd" class="text-red-600">x</span>
               新增品項
@@ -114,11 +115,25 @@
                 </div>
                 <div class="absolute right-5 flex gap-5">
                   <div class="hover:text-red-600" v-if="props.id">
-                    <button type="button" @click="toggleEditing(ingredient.id)">✎</button>
+                    <button
+                      type="button"
+                      @click="toggleEditing(ingredient.id)"
+                      :disabled="isSubmitting"
+                      class="disabled:text-slate-500"
+                    >
+                      ✎
+                    </button>
                   </div>
 
                   <div class="hover:text-red-600">
-                    <button type="button" @click="handleCancelAdd(index)">X</button>
+                    <button
+                      type="button"
+                      @click="handleCancelAdd(index)"
+                      :disabled="isSubmitting"
+                      class="disabled:text-slate-500"
+                    >
+                      X
+                    </button>
                   </div>
                 </div>
               </li>
@@ -129,6 +144,7 @@
               <button
                 @click="handleCancelEdit"
                 v-if="listId"
+                :disabled="isSubmitting"
                 class="flex items-center gap-1 group disabled:text-slate-500"
               >
                 <span
