@@ -60,7 +60,8 @@
 <script setup>
 import { useAuthStore } from '@/stores/authStore'
 import { ref } from 'vue'
-
+import { useRouter } from 'vue-router'
+const router = useRouter()
 const isOpen = ref(false)
 const toggleNavOpen = () => {
   isOpen.value = !isOpen.value
@@ -68,6 +69,7 @@ const toggleNavOpen = () => {
 const authStore = useAuthStore()
 const handleLogOut = () => {
   authStore.logOut()
+  router.replace('/')
 }
 const handleCloseMenu = () => {
   setTimeout(() => {

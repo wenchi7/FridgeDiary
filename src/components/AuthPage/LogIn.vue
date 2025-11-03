@@ -35,13 +35,10 @@
   </form>
 </template>
 <script setup>
-import { signInWithEmailAndPassword } from 'firebase/auth'
+import { useAuthStore } from '@/stores/authStore'
 import { ref } from 'vue'
-import { auth, db } from '@/firebase/init'
 import { useRouter } from 'vue-router'
-import { getDoc, serverTimestamp } from 'firebase/firestore'
-import { setDoc, doc } from 'firebase/firestore'
-
+const { logIn } = useAuthStore()
 const email = ref('')
 const password = ref('')
 const router = useRouter()
@@ -50,33 +47,24 @@ const isVerified = ref(false)
 
 const handleLogIn = async () => {
   try {
-    const userLogIn = await signInWithEmailAndPassword(auth, email.value, password.value)
-    const user = userLogIn.user
-    if (!user.emailVerified) {
-      isVerified.value = true
-      await auth.signOut()
-      return
-    }
+    await logIn(email.value, password.value)
+
     router.push({ name: 'shoplist' })
-    const userDocRef = doc(db, 'users', user.uid)
-    const userDocSnap = await getDoc(userDocRef)
-    if (!userDocSnap.exists()) {
-      await setDoc(userDocRef, {
-        name: user.displayName,
-        email: user.email,
-        createdAt: serverTimestamp(),
-      })
-    }
+
     isError.value = false
     password.value = ''
   } catch (error) {
     console.log('登入錯誤：', error.message)
-    isError.value = true
+    if (error.message === 'EMAIL_NOT_VERIFIED') {
+      isVerified.value = true
+    } else {
+      isError.value = true
+      setTimeout(() => {
+        isError.value = false
+      }, 3000)
+    }
     email.value = ''
     password.value = ''
-    setTimeout(() => {
-      isError.value = false
-    }, 1000)
   }
 }
 </script>
