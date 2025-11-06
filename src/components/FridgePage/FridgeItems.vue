@@ -5,61 +5,88 @@
     <h1 class="text-center text-sky-700 mb-10 tracking-widest text-2xl md:text-3xl lg:text-4xl">
       What's in my fridge ?
     </h1>
-
-    <ul>
-      <li
-        v-for="ingredient in ingredients"
-        :key="ingredient.id"
-        class="relative sm:grid sm:grid-cols-[250px_auto] md:grid-cols-[375px_auto] lg:grid-cols-[500px_auto] flex flex-col border-b border-stone-700 my-2 transition-all ease-out duration-300"
+    <div v-if="isLoading" class="flex flex-col items-center gap-4 mt-10">
+      <svg
+        class="-ml-1 mr-3 h-5 w-5 animate-spin text-white"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
       >
-        <div class="mb-3 sm:mb-0">
-          <span class="text-start block break-words sm:max-w-[27ch]">。{{ ingredient.name }}</span>
-        </div>
+        <circle
+          class="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          stroke-width="4"
+        ></circle>
+        <path
+          class="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+        ></path>
+      </svg>
+      <p>載入中。。。</p>
+    </div>
 
-        <div class="px-3 mb-2 gap-5 flex justify-between sm:grid sm:grid-cols-2">
-          <div class="flex gap-2 items-center">
-            <span class="leading-none"
-              >還有: {{ ingredient.quantity - ingredient.deducted }}
-              <span class="whitespace-nowrap text-base md:text-2xl lg:text-3xl">{{
-                ingredient.unit
-              }}</span>
-            </span>
-          </div>
-
-          <div
-            class="text-center mr-3 flex flex-col items-end leading-none transition-all duration-300"
-            :class="{ 'sm:-translate-x-20': editingId === ingredient.id }"
-          >
-            <span class="whitespace-nowrap text-red-700">到期日</span>
-
-            <span class="whitespace-nowrap text-red-700"> {{ ingredient.expiryDate }}</span>
-          </div>
-        </div>
-
-        <div class="absolute right-5 sm:-right-8 top-0 sm:top-2">
-          <div v-if="editingId !== ingredient.id">
-            <button
-              @click="startEditing(ingredient.id)"
-              class="rounded-lg hover:bg-zinc-300 flex justify-center"
+    <div v-else>
+      <ul>
+        <li
+          v-for="ingredient in ingredients"
+          :key="ingredient.id"
+          class="relative sm:grid sm:grid-cols-[250px_auto] md:grid-cols-[375px_auto] lg:grid-cols-[500px_auto] flex flex-col border-b border-stone-700 my-2 transition-all ease-out duration-300"
+        >
+          <div class="mb-3 sm:mb-0">
+            <span class="text-start block break-words sm:max-w-[27ch]"
+              >。{{ ingredient.name }}</span
             >
-              🔪
-            </button>
           </div>
 
-          <div v-else class="flex gap-1">
-            <select v-model.number="ingredient.selectedDeduct" class="mr-2">
-              <option v-for="q in getQuantityOptions(ingredient)" :key="q">{{ q }}</option>
-            </select>
-            <button
-              @click="handleDeduct(ingredient.id)"
-              class="rounded-lg hover:bg-zinc-300 flex justify-center items-center"
+          <div class="px-3 mb-2 gap-5 flex justify-between sm:grid sm:grid-cols-2">
+            <div class="flex gap-2 items-center">
+              <span class="leading-none"
+                >還有: {{ ingredient.quantity - ingredient.deducted }}
+                <span class="whitespace-nowrap text-base md:text-2xl lg:text-3xl">{{
+                  ingredient.unit
+                }}</span>
+              </span>
+            </div>
+
+            <div
+              class="text-center mr-3 flex flex-col items-end leading-none transition-all duration-300"
+              :class="{ 'sm:-translate-x-20': editingId === ingredient.id }"
             >
-              ✔
-            </button>
+              <span class="whitespace-nowrap text-red-700">到期日</span>
+
+              <span class="whitespace-nowrap text-red-700"> {{ ingredient.expiryDate }}</span>
+            </div>
           </div>
-        </div>
-      </li>
-    </ul>
+
+          <div class="absolute right-5 sm:-right-8 top-0 sm:top-2">
+            <div v-if="editingId !== ingredient.id">
+              <button
+                @click="startEditing(ingredient.id)"
+                class="rounded-lg hover:bg-zinc-300 flex justify-center"
+              >
+                🔪
+              </button>
+            </div>
+
+            <div v-else class="flex gap-1">
+              <select v-model.number="ingredient.selectedDeduct" class="mr-2">
+                <option v-for="q in getQuantityOptions(ingredient)" :key="q">{{ q }}</option>
+              </select>
+              <button
+                @click="handleDeduct(ingredient.id)"
+                class="rounded-lg hover:bg-zinc-300 flex justify-center items-center"
+              >
+                ✔
+              </button>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -81,18 +108,24 @@ import { ref, onMounted } from 'vue'
 const authStore = useAuthStore()
 const userId = authStore.user.id
 const ingredients = ref([])
-
 const editingId = ref(null)
+const isLoading = ref(true)
 
 const fetchStocksInfo = async () => {
-  const ingredientRef = collection(db, `users/${userId}/stocks`)
-  const ingredientQuery = query(ingredientRef, orderBy('name'), orderBy('createdAt'))
-  const ingredientSnap = await getDocs(ingredientQuery)
-  ingredients.value = ingredientSnap.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-    selectedDeduct: 0,
-  }))
+  try {
+    const ingredientRef = collection(db, `users/${userId}/stocks`)
+    const ingredientQuery = query(ingredientRef, orderBy('name'), orderBy('createdAt'))
+    const ingredientSnap = await getDocs(ingredientQuery)
+    ingredients.value = ingredientSnap.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+      selectedDeduct: 0,
+    }))
+  } catch (error) {
+    console.error('載入失敗', error)
+  } finally {
+    isLoading.value = false
+  }
 }
 
 const getQuantityOptions = (ingredient) => {
