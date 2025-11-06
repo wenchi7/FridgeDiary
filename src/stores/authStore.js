@@ -9,26 +9,33 @@ import { defineStore } from 'pinia'
 import { auth, db } from '@/firebase/init'
 import { ref } from 'vue'
 import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore'
+
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
   const isAuthReady = ref(false)
+  let unsubscribeAuth = null
 
   const setUser = (userData) => {
     user.value = userData
   }
+
   const initAuth = async () => {
-    onAuthStateChanged(auth, (firebaseUser) => {
-      console.log('auth change:', firebaseUser)
-      if (firebaseUser) {
-        setUser({
-          id: firebaseUser.uid,
-          email: firebaseUser.email,
-          displayName: firebaseUser.displayName || 'user',
-        })
-      } else {
-        setUser(null)
-      }
-      isAuthReady.value = true
+    return new Promise((resolve) => {
+      onAuthStateChanged(auth, (firebaseUser) => {
+        if (firebaseUser) {
+          setUser({
+            id: firebaseUser.uid,
+            email: firebaseUser.email,
+            displayName: firebaseUser.displayName || 'user',
+          })
+        } else {
+          setUser(null)
+        }
+        if (!isAuthReady.value) {
+          isAuthReady.value = true
+          resolve(firebaseUser)
+        }
+      })
     })
   }
 
@@ -42,6 +49,12 @@ export const useAuthStore = defineStore('auth', () => {
         await signOut(auth)
         throw new Error('EMAIL_NOT_VERIFIED')
       }
+      setUser({
+        id: user.uid,
+        email: user.email,
+        displayName: user.displayName || 'user',
+      })
+
       const userDocRef = doc(db, 'users', user.uid)
       const userDocSnap = await getDoc(userDocRef)
 
@@ -62,9 +75,10 @@ export const useAuthStore = defineStore('auth', () => {
   const logOut = async () => {
     try {
       await signOut(auth)
-      sessionStorage.removeItem('loginUser')
+      unsubscribeAuth?.()
       user.value = null
       console.log('登出了')
+      console.log(auth)
     } catch (error) {
       alert('登出失敗', error.message)
     }

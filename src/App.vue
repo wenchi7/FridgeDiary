@@ -1,12 +1,4 @@
-<script setup>
-import { onMounted } from 'vue'
-import { useAuthStore } from './stores/authStore'
-
-const authStore = useAuthStore()
-onMounted(() => {
-  authStore.initAuth()
-})
-</script>
+<script setup></script>
 
 <template>
   <header class="font-chenyu font-medium">
