@@ -37,3 +37,4 @@ coverage/
 .firebaserc	
 .vercel/
 .netlify/
+.vercel
