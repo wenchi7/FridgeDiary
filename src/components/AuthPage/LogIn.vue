@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="handleLogIn" class="flex justify-center flex-col gap-10">
+  <form @submit.prevent="handleLogIn" class="flex justify-center flex-col gap-6 md:gap-10">
     <input
       v-model="email"
       type="text"
