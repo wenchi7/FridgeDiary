@@ -31,6 +31,31 @@
           :key="ingredient.id"
           class="relative sm:grid sm:grid-cols-[250px_auto] md:grid-cols-[375px_auto] lg:grid-cols-[500px_auto] flex flex-col border-b border-stone-700 my-2 transition-all ease-out duration-300 animate-bg-pulse"
         >
+          <div
+            v-if="ingredient.isThrowed"
+            class="absolute inset-0 bg-white/80 flex items-center justify-center z-10 transition-opacity duration-300"
+          >
+            <svg
+              class="animate-spin h-6 w-6 text-gray-700"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+              ></path>
+            </svg>
+          </div>
           <div class="mb-3 sm:mb-0">
             <span class="ml-3 sm:ml-0 text-start block break-words sm:max-w-[27ch]"
               >🚨{{ ingredient.name }}</span

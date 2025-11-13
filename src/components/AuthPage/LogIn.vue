@@ -24,10 +24,32 @@
     <div class="flex flex-col">
       <p v-if="isError" class="text-center text-red-600 text-xl mb-4">登入錯誤<br />請重新輸入！</p>
       <p v-if="isVerified" class="text-center text-red-600 text-xl mb-4">請先驗證email信箱</p>
-
+      <p v-if="isLoading" class="flex justify-center mb-4">
+        <svg
+          class="animate-spin h-6 w-6 text-pink-950"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            class="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            stroke-width="4"
+          ></circle>
+          <path
+            class="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+          ></path>
+        </svg>
+      </p>
       <button
+        :disabled="isLoading"
         type="submit"
-        class="bg-red-900 text-white h-12 font-chenyu text-2xl tracking-widest rounded-sm cursor-pointer hover:bg-red-700"
+        class="bg-red-900 text-white h-12 font-chenyu text-2xl tracking-widest rounded-sm cursor-pointer hover:bg-red-700 disabled:hover:bg-red-900"
       >
         登 入
       </button>
@@ -44,9 +66,10 @@ const password = ref('')
 const router = useRouter()
 const isError = ref(false)
 const isVerified = ref(false)
-
+const isLoading = ref(false)
 const handleLogIn = async () => {
   try {
+    isLoading.value = true
     await logIn(email.value, password.value)
 
     router.push({ name: 'shoplist' })
@@ -55,6 +78,7 @@ const handleLogIn = async () => {
     password.value = ''
   } catch (error) {
     console.log('登入錯誤：', error.message)
+    isLoading.value = false
     if (error.message === 'EMAIL_NOT_VERIFIED') {
       isVerified.value = true
     } else {
