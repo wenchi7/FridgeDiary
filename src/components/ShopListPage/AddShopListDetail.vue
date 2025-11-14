@@ -15,6 +15,7 @@
             class="flex-1 w-full sm:w-10/12 border border-stone-400 pl-2 disabled:bg-transparent disabled:border-transparent"
             placeholdder="請輸入清單標題  ex：8/8咖哩飯"
             required
+            @keydown.enter.prevent
           />
         </div>
         <div class="flex flex-col w-full">

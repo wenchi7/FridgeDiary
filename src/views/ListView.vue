@@ -208,20 +208,23 @@ const handleCancelList = async () => {
     ingredientsSnap.docs.forEach((docSnap) => {
       batch.delete(docSnap.ref)
     })
+    const ingredientIds = ingredientsSnap.docs.map((doc) => doc.id)
 
-    const ingredientsStockRef = collection(db, `users/${userId}/stocks`)
-    const relatedStockQuery = query(
-      ingredientsStockRef,
-      where(
-        'shoplistIngredientId',
-        'in',
-        ingredientsSnap.docs.map((doc) => doc.id),
-      ),
-    )
-    const relatedStockSnap = await getDocs(relatedStockQuery)
-    relatedStockSnap.docs.forEach((docSnap) => {
-      batch.delete(docSnap.ref)
-    })
+    if (ingredientIds.length > 0) {
+      const ingredientsStockRef = collection(db, `users/${userId}/stocks`)
+      const relatedStockQuery = query(
+        ingredientsStockRef,
+        where(
+          'shoplistIngredientId',
+          'in',
+          ingredientsSnap.docs.map((doc) => doc.id),
+        ),
+      )
+      const relatedStockSnap = await getDocs(relatedStockQuery)
+      relatedStockSnap.docs.forEach((docSnap) => {
+        batch.delete(docSnap.ref)
+      })
+    }
 
     const listRef = doc(db, `users/${userId}/shoplists/${listId}`)
 
