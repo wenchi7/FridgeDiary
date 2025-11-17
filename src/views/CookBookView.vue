@@ -23,7 +23,7 @@
     <p>載入中。。。</p>
   </div>
 
-  <div v-else class="mx-10 sm:mx-16 mt-8 mb-16">
+  <div v-else class="mx-10 sm:mx-16 mb-16 mt-2 m-4 sm:m-10">
     <h1 class="text-center text-3xl">🎲 今日食譜抽籤</h1>
 
     <div v-if="!recipe" class="flex justify-center mt-7">

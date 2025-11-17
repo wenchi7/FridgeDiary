@@ -1,6 +1,8 @@
 <template>
-  <div class="m-10 text-xl md:text-2xl lg:text-3xl transition-all duration-100 ease-in-out">
-    <h1 class="text-3xl flex justify-center mb-7">即期品區</h1>
+  <div
+    class="mt-2 m-4 sm:m-10 text-xl md:text-2xl lg:text-3xl transition-all duration-100 ease-in-out"
+  >
+    <h1 class="text-3xl flex justify-center mb-7 text-red-600">即期品區</h1>
     <div v-if="isLoading" class="flex flex-col items-center gap-4 mt-10">
       <svg
         class="-ml-1 mr-3 h-5 w-5 animate-spin text-white"
@@ -25,7 +27,7 @@
       <p>載入中。。。</p>
     </div>
     <div v-else>
-      <ul>
+      <ul v-if="ingredients.length > 0">
         <li
           v-for="ingredient in expiredIngredients"
           :key="ingredient.id"
@@ -106,6 +108,7 @@
           </div>
         </li>
       </ul>
+      <div v-else class="flex justify-center mt-20">目前沒有任何食材即期喔！</div>
     </div>
   </div>
 </template>
