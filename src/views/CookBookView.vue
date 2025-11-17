@@ -23,7 +23,7 @@
     <p>載入中。。。</p>
   </div>
 
-  <div v-else class="mx-16 my-16">
+  <div v-else class="mx-10 sm:mx-16 mt-8 mb-16">
     <h1 class="text-center text-3xl">🎲 今日食譜抽籤</h1>
 
     <div v-if="!recipe" class="flex justify-center mt-7">
@@ -31,7 +31,7 @@
     </div>
 
     <div v-else class="mt-10 text-xl md:text-2xl lg:text-3xl">
-      <div class="flex flex-col sm:flex-row gap-10 mb-5 p-5 sm:p-4 items-center justify-start">
+      <div class="flex flex-col sm:flex-row gap-10 mb-5 p-0 sm:p-4 items-center justify-start">
         <img v-if="recipe.image" :src="recipe.image" alt="recipe" class="w-72 h-auto" />
         <div>
           <h2 class="mb-5 font-semibold">{{ recipe.title }}</h2>
@@ -40,10 +40,10 @@
         </div>
       </div>
 
-      <div class="flex flex-col gap-5 w-full">
-        <div class="w-full border-b border-slate-800 p-5">
+      <div class="flex flex-col gap-10 w-full p-0 sm:p-5">
+        <div class="w-full border-b border-slate-800">
           <p class="mb-2">食材：</p>
-          <ul class="grid grid-cols-2 w-full">
+          <ul class="grid grid-cols-1 sm:grid-cols-2 w-full mb-5">
             <li
               v-for="(ingredient, index) in recipe.extendedIngredients"
               :key="index"
@@ -56,9 +56,9 @@
         </div>
 
         <div>
-          <ul class="list-decimal w-full py-5 px-9">
-            <p class="mb-2">步驟：</p>
+          <p class="mb-2">步驟：</p>
 
+          <ul class="list-decimal w-full pb-5 px-6">
             <li
               v-for="(step, index) in recipe.analyzedInstructions[0]?.steps"
               :key="index"
