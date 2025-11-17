@@ -4,6 +4,9 @@
       <div
         class="fixed top-0 left-0 w-full h-28 sm:h-32 z-30 bg-MyColor-purple flex flex-col flex-shrink-0"
       >
+        <p class="mx-5 my-4 text-2xl md:text-3xl text-MyColor-yellow font-medium tracking-widest">
+          {{ userName }} 's Fridge
+        </p>
         <button
           @click="handleLogOut"
           class="absolute right-2 w-32 py-4 px-8 text-pink-800 text-2xl font-semibold hover:text-red-500 cursor-pointer"
@@ -63,11 +66,11 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 const isOpen = ref(false)
-
+const authStore = useAuthStore()
+const userName = authStore.user.displayName
 const toggleNavOpen = () => {
   isOpen.value = !isOpen.value
 }
-const authStore = useAuthStore()
 
 const handleLogOut = async () => {
   await authStore.logOut()
