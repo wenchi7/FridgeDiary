@@ -1,5 +1,29 @@
 <template>
-  <div class="mx-16 my-16">
+  <div v-if="isLoading" class="flex flex-col items-center gap-4 mt-10">
+    <svg
+      class="-ml-1 mr-3 h-5 w-5 animate-spin text-white"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        class="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        stroke-width="4"
+      ></circle>
+      <path
+        class="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+      ></path>
+    </svg>
+    <p>載入中。。。</p>
+  </div>
+
+  <div v-else class="mx-16 my-16">
     <h1 class="text-center text-3xl">🎲 今日食譜抽籤</h1>
 
     <div v-if="!recipe" class="flex justify-center mt-7">
@@ -60,23 +84,29 @@ const recipe = ref(null)
 const authStore = useAuthStore()
 const userId = authStore.user.id
 const today = new Date().toISOString().split('T')[0]
+const storageKey = `dailyRecipe-${userId}`
+const isLoading = ref(true)
 
 const checkDailyRecipe = async () => {
-  const local = JSON.parse(localStorage.getItem('dailyRecipe'))
+  const local = JSON.parse(localStorage.getItem(storageKey))
   if (local?.date === today) {
     recipe.value = local.recipe
+    isLoading.value = false
+
     return
   } else {
-    localStorage.removeItem('dailyRecipe')
+    localStorage.removeItem(storageKey)
   }
   const docRef = doc(db, 'users', userId, 'dailyRecipe', 'current')
   const docSnap = await getDoc(docRef)
+
   if (docSnap.exists() && docSnap.data().date === today) {
     recipe.value = docSnap.data().recipe
-    localStorage.setItem('dailyRecipe', JSON.stringify({ date: today, recipe: recipe.value }))
+    localStorage.setItem(storageKey, JSON.stringify({ date: today, recipe: recipe.value }))
   } else {
     recipe.value = null
   }
+  isLoading.value = false
 }
 
 const handleCardSelected = async (id) => {
@@ -91,7 +121,7 @@ const handleCardSelected = async (id) => {
     recipe: recipe.value,
     date: today,
   })
-  localStorage.setItem('dailyRecipe', JSON.stringify({ date: today, recipe: recipe.value }))
+  localStorage.setItem(storageKey, JSON.stringify({ date: today, recipe: recipe.value }))
 }
 
 onMounted(() => {

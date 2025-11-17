@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import LogInView from '@/views/LogInView.vue'
 import { useAuthStore } from '@/stores/authStore'
 import { watch } from 'vue'
+import CookBookView from '@/views/CookBookView.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -48,7 +49,7 @@ const router = createRouter({
           name: 'shortdated',
           component: () => import('@/views/ShortDatedView.vue'),
         },
-        { path: 'cookbook', name: 'cookbook', component: () => import('@/views/CookBookView.vue') },
+        { path: 'cookbook', name: 'cookbook', component: CookBookView },
         {
           path: 'mycookbook',
           name: 'mycookbook',

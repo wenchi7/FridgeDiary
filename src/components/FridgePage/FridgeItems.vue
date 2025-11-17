@@ -29,8 +29,8 @@
       <p>載入中。。。</p>
     </div>
 
-    <div v-else>
-      <ul>
+    <div v-else class="h-full">
+      <ul v-if="ingredients.length > 0">
         <li
           v-for="ingredient in ingredients"
           :key="ingredient.id"
@@ -86,6 +86,7 @@
           </div>
         </li>
       </ul>
+      <div v-else class="flex justify-center mt-20">目前沒有任何食材喔！</div>
     </div>
   </div>
 </template>
