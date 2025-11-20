@@ -21,7 +21,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const initAuth = async () => {
     return new Promise((resolve) => {
-      onAuthStateChanged(auth, (firebaseUser) => {
+      unsubscribeAuth = onAuthStateChanged(auth, (firebaseUser) => {
         if (firebaseUser) {
           setUser({
             id: firebaseUser.uid,
@@ -80,7 +80,7 @@ export const useAuthStore = defineStore('auth', () => {
       console.log('登出了')
       console.log(auth)
     } catch (error) {
-      alert('登出失敗', error.message)
+      alert(`登出失敗'${error.message}`)
     }
   }
 
