@@ -77,8 +77,8 @@
 - **每日自動抓取食譜** (AI協助自架後端自動更新，部署於 Vercel）
 
     使用 Node.js 撰寫後端程式，每天自動向Spoonacular API抓取20篇隨機食譜，並更新至Firebase Firestore。  
-        部署於Vercel，確保前端每日都能取得最新食譜並存入firestore裡。
-
+        部署於Vercel，確保前端每日都能取得最新食譜並存入firestore裡。<br>
+  GitHub: [https://github.com/wenchi7/cookbook-backend.git](https://github.com/wenchi7/cookbook-backend.git)
   
 ## 開發工具與部署 Development Tools and Deployment
 - **Vite**
