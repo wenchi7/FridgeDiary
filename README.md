@@ -21,7 +21,7 @@
 
 ## 專案發想 Project Idea
 
-我喜歡煮飯，但經常有一些困擾。
+我喜歡煮飯，但經常有一些困擾。<br>
 例如，打開冰箱時，常常忘記裡面到底還有哪些食材；
 要開始做菜時才發現某樣食材已經過期或只剩一點，
 甚至煮到一半才發現某個材料根本沒有了。
@@ -33,12 +33,12 @@
 
 - 使用者登入 / 註冊 
 - 購買清單紀錄
-- 食材新增、編輯、刪除
+- 清單編輯
 - 食材庫存、使用刪減
-- 判斷食材是否進入「即期區」
+- 即期過期之食材提醒
 - RWD（響應式設計），適用手機與桌面
-- user狀態管理使用 Pinia
-- 每日自動抓取食譜(AI協助自架後端自動更新，部署於 Vercel）
+- user 狀態管理使用 Pinia
+- 每日隨機食譜( AI 協助自架後端自動更新，部署於 Vercel）
 
 
 
@@ -54,13 +54,13 @@
         快速排版，搭配元件拆分與路由規劃。
 - **Toast / 提示訊息**
     <br>
-        使用Vue Toastification顯示輕量提示訊息元件，提醒使用者操作結果，例如註冊成功或失敗信息。
+        使用 Vue Toastification 顯示輕量提示訊息元件，提醒使用者操作結果，例如註冊成功或失敗信息。
 - **Vue Router** 
     <br>
         負責前端頁面導覽，支援巢狀路由與動態路由功能，實現單頁應用的多視圖切換。
 - **Pinia** 
    <br>
-       使用Pinia狀態管理，包含使用者登入登出狀態、初始信箱驗證。
+       使用 Pinia 狀態管理，包含使用者登入登出狀態、初始信箱驗證。
 
 - **Lazy Loading 懶加載** 
     <br>
@@ -72,22 +72,23 @@
 **後端**
 - **Firebase** 
     <br>
-        使用 Firebase 提供的Firestore 做為後端資料庫，儲存文章內容、留言與使用者資料;
-        透過Authentication實作會員登入、註冊系統、驗證信箱等功能。
-- **每日自動抓取食譜** (AI協助自架後端自動更新，部署於 Vercel）
+        使用 Firebase 提供的 Firestore 做為後端資料庫，儲存文章內容、留言與使用者資料;
+        透過 Authentication 實作會員登入、註冊系統、驗證信箱等功能。
+- **每日自動抓取食譜** (AI協助）
 
-    使用 Node.js 撰寫後端程式，每天自動向Spoonacular API抓取20篇隨機食譜，並更新至Firebase Firestore。  
-        部署於Vercel，確保前端每日都能取得最新食譜並存入firestore裡。<br>
-  GitHub: [https://github.com/wenchi7/cookbook-backend.git](https://github.com/wenchi7/cookbook-backend.git)
+    將 Node.js 功能寫成 Vercel Serverless Function， 透過外部排程服務（cron job）定時呼叫 API，
+    讓系統能每天自動向 Spoonacular API 抓取 20 篇隨機食譜，並更新至 Firebase Firestore。
+   <br>GitHub: https://github.com/wenchi7/cookbook-backend.git
   
 ## 開發工具與部署 Development Tools and Deployment
 - **Vite**
   <br>
-  使用Vue搭配Vite快速建置專案，提供即時模組熱重載與高效能打包能力。
+  使用 Vue 搭配 Vite 快速建置專案，提供即時模組熱重載與高效能打包能力。
   <br>
-- **Vercel**部署 
+- **Vercel** 部署
+  <br>
  前端專案直接部署於 Vercel。  
- 後端 Node.js serverless function 也部署於 Vercel，負責每日自動抓取食譜。  
+ 後端則使用 Vercel 的 Serverless Functions 實作，提供抓取食譜並更新資料的 API，由外部排程服務定時呼叫，以確保資料每日自動更新。
 
 
 ## 專案架構 Project Structure
@@ -99,11 +100,11 @@ FridgeDiary/
     dailyRecipe.js          # 每天自動抓 20 篇食譜，更新 Firebase
   src/
     assets/                 # 圖片、樣式
-    components/             # Vue文件
+    components/             # Vue 文件
     firebase/               # Firebase 設定檔
     router/                 # Vue Router 路由設定
-    stores/                 # Pinia狀態管理
-    views/                  # 各頁面的view
+    stores/                 # Pinia 狀態管理
+    views/                  # 各頁面的 view
   README.md
   
 ```
@@ -112,7 +113,7 @@ FridgeDiary/
 ## 頁面使用說明 Page Guide
 ![Website Screenshot](src/assets/stocks-shortdated-view.png)
 - 冰箱庫存（左圖）：
-清楚看出所剩的食材數量。若以使用食材，可以透過點擊🔪扣除數量，維持最新的庫存狀態。
+清楚看出所剩的食材數量。若以使用食材，可以透過點擊 🔪 扣除數量，維持最新的庫存狀態。
 
 - 即期警戒區（右圖）：
 分為過期區及即期區兩區
