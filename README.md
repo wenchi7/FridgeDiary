@@ -1,6 +1,7 @@
 # FridgeDiary
 
-網址：https://your-fridge-diary.vercel.app
+[線上 Demo - FridgeDiary](https://your-fridge-diary.vercel.app)
+
 
 ![Website Screenshot](src/assets/login-view-1.png)
 <br>
