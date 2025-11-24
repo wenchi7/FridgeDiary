@@ -78,7 +78,7 @@
 
     將 Node.js 功能寫成 Vercel Serverless Function， 透過外部排程服務（cron job）定時呼叫 API，
     讓系統能每天自動向 Spoonacular API 抓取 20 篇隨機食譜，並更新至 Firebase Firestore。
-   <br>GitHub: https://github.com/wenchi7/cookbook-backend.git
+   <br>GitHub: https://github.com/wenchi7/cookbook-backend
   
 ## 開發工具與部署 Development Tools and Deployment
 - **Vite**
