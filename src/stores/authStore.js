@@ -1,5 +1,5 @@
 import {
-  browserSessionPersistence,
+  browserLocalPersistence,
   onAuthStateChanged,
   setPersistence,
   signInWithEmailAndPassword,
@@ -20,7 +20,6 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const initAuth = async () => {
-    return new Promise((resolve) => {
       unsubscribeAuth = onAuthStateChanged(auth, (firebaseUser) => {
         if (firebaseUser) {
           setUser({
@@ -33,14 +32,13 @@ export const useAuthStore = defineStore('auth', () => {
         }
         if (!isAuthReady.value) {
           isAuthReady.value = true
-          resolve(firebaseUser)
+
         }
       })
-    })
-  }
+    }
 
   const logIn = async (email, password) => {
-    await setPersistence(auth, browserSessionPersistence)
+    await setPersistence(auth, browserLocalPersistence)
 
     try {
       const userLogIn = await signInWithEmailAndPassword(auth, email, password)
