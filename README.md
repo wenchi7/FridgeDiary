@@ -17,7 +17,7 @@
 - [專案架構 Project Structure](#專案架構-project-structure)
 - [開發工具與部署 Development Tools and Deployment](#開發工具與部署-development-tools-and-deployment)
 - [頁面使用說明 Page Guide](#頁面使用說明-page-guide)
-- [計劃未來會實現 Planned feature](#計劃未來會實現-planned-feature)
+- [計劃未來會實現 Planned Feature](#計劃未來會實現-planned-feature)
 
 
 ## 專案發想 Project Idea
@@ -97,8 +97,6 @@
 
 ```text
 FridgeDiary/
-  cookbook-backend/                  
-    dailyRecipe.js          # 每天自動抓 20 篇食譜，更新 Firebase
   src/
     assets/                 # 圖片、樣式
     components/             # Vue 文件
@@ -107,7 +105,9 @@ FridgeDiary/
     stores/                 # Pinia 狀態管理
     views/                  # 各頁面的 view
   README.md
-  
+
+cookbook-backend/                  
+  dailyRecipe.js          # 每天自動抓 20 篇食譜，更新 Firebase
 ```
 
 ---
@@ -132,7 +132,7 @@ FridgeDiary/
 
 此帳號僅供測試！歡迎自行註冊帳號體驗！
 
-## 計劃未來會實現 Planned feature
+## 計劃未來會實現 Planned Feature
 
 - **家庭共用功能**  
   未來將開發多人共用的管理功能，可以共用冰箱查看庫存、即期區提醒，方便全家購物與食材管理。
